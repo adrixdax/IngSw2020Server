@@ -1,0 +1,79 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <repositories>
+        <repository>
+            <id>Eonic</id>
+            <name>Public Eonic</name>
+            <url>https://repo.enonic.com/public/</url>
+        </repository>
+        <repository>
+            <id>GoogleCollect</id>
+            <name>Google Collect</name>
+            <url>https://mvnrepository.com/artifact/com.google.common/google-collect</url>
+        </repository>
+    </repositories>
+
+    <name>slf4jconfig-javalogging</name>
+    <url>http://maven.apache.org</url>
+
+    <dependencies>
+        <!--  https://mvnrepository.com/artifact/org.slf4j/slf4j-api  -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.30</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-nop -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+            <version>1.7.30</version>
+            <scope>test</scope>
+        </dependency>
+        <!--  https://mvnrepository.com/artifact/com.google.guava/guava  -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>r05</version>
+        </dependency>
+        <!--  https://mvnrepository.com/artifact/com.google.common/google-collect  -->
+        <dependency>
+            <groupId>com.google.common</groupId>
+            <artifactId>google-collect</artifactId>
+            <version>0.5</version>
+        </dependency>
+        <!--  https://mvnrepository.com/artifact/com.google.guava/guava  -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+        </dependency>
+        <!--  https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient  -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.3.6</version>
+        </dependency>
+        <!--  https://mvnrepository.com/artifact/org.yamj/api-common  -->
+        <dependency>
+            <groupId>org.yamj</groupId>
+            <artifactId>api-common</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.13</version>
+        </dependency>
+
+    </dependencies>
+
+    <groupId>groupId</groupId>
+    <artifactId>IngSw2020Server</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
+</project>
