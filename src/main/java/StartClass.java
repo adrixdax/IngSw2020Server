@@ -1,5 +1,14 @@
+import DataBase.DbConnectionForBackEnd;
+import MovieDB.CineMatesTheMovieDB;
+import core.Classes.User;
+import core.sql.FactoryRecord;
+import info.movito.themoviedbapi.model.MovieDb;
 import org.springframework.boot.SpringApplication;
 import spring.GeneralController;
+import utility.Json.JSONCreation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class StartClass {
@@ -7,7 +16,7 @@ public class StartClass {
 
     public static void main(String[] args) {
         SpringApplication.run(GeneralController.class, args);
-        /*DbConnectionForBackEnd db = new DbConnectionForBackEnd();
+        DbConnectionForBackEnd db = new DbConnectionForBackEnd();
         db.test();
         CineMatesTheMovieDB TheMovieDBAPI = new CineMatesTheMovieDB();
         List<MovieDb> actorFilmography = TheMovieDBAPI.searchActorFilmography("Bonnie Wright");
@@ -23,7 +32,7 @@ public class StartClass {
         users.add(u2);
         String anotherjson = JSONCreation.getJSONToCreate(users);
         System.out.println(anotherjson);
-*/
+
     }
 
 }
