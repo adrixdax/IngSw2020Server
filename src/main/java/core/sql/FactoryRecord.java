@@ -3,7 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.cinemates.core.sql;
+package core.sql;
+
+import utility.MySQLUtility;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -49,7 +51,9 @@ public class FactoryRecord {
         String select = "select * from " + c.getSimpleName() + " " + whereclausule;
         try {
             Statement st;
+            assert cnn != null;
             st = cnn.createStatement();
+            System.out.println(select);
             ResultSet rs = st.executeQuery(select);
             if (rs.next()) {
                 onj = (AbstractSQLRecord) c.newInstance();

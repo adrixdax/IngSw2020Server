@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.cinemates.core.sql;
+package core.sql;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

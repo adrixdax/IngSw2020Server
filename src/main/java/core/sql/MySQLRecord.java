@@ -1,9 +1,11 @@
+package core.sql;
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.cinemates.core.sql;
+
+import utility.MySQLUtility;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -105,12 +107,12 @@ public class MySQLRecord extends AbstractSQLRecord {
             Method metodo = c.getMethod("getId_" + c.getSimpleName());
             rest = (String) metodo.invoke(this);
         } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException ex) {
-            Logger.getLogger(MySQLRecord.class.getName()).log(Level.SEVERE, (String) null, ex);
+            Logger.getLogger(MySQLRecord.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return rest;
     }
-    
+
     public String getUpdateCommand() {
         String rest = "";
         switch (this.data_type) {
@@ -142,21 +144,21 @@ public class MySQLRecord extends AbstractSQLRecord {
             Logger.getLogger(MySQLRecord.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    
+
+
     public void addRecord(){
-        
+
         try{
             this.beforeRecordInsert();
-            
+
             MySQLUtility.getNewIstance(this.getSql_connection()).addRecordToDB(this);
-            
+
             this.afterRecordInsert();
-            
+
         }catch (IllegalArgumentException ex) {
             Logger.getLogger(MySQLRecord.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
 
 }
