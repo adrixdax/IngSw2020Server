@@ -16,21 +16,15 @@ import java.util.List;
 
 public class CineMatesTheMovieDB {
 
-    private static TmdbMovies singleMovieSearch;
-    private final TmdbApi api;
-    private final TmdbSearch generalSearchService;
-
-    public CineMatesTheMovieDB() {
-        api = new TmdbApi("cc5fb6d50718c39062251de8b4d2995c");
-        singleMovieSearch = api.getMovies();
-        generalSearchService = api.getSearch();
-    }
+    private static final TmdbApi api = new TmdbApi("cc5fb6d50718c39062251de8b4d2995c");
+    private static final TmdbMovies singleMovieSearch = api.getMovies();
+    private static final TmdbSearch generalSearchService = api.getSearch();
 
     public static MovieDb searchFilmById(int filmId) {
         return singleMovieSearch.getMovie(filmId, "it", TmdbMovies.MovieMethod.credits);
     }
 
-    public List<MovieDb> searchFilmByName(String filmName, int searchYear, boolean adultEnable) {
+    public static List<MovieDb> searchFilmByName(String filmName, int searchYear, boolean adultEnable) {
         if (filmName.length() > 0) {
             MovieResultsPage newmovies = generalSearchService.searchMovie(filmName, searchYear, "it", adultEnable, 0);
             if (newmovies.getTotalResults() > 0) {
@@ -45,11 +39,19 @@ public class CineMatesTheMovieDB {
             return new ArrayList<>();
     }
 
-    public List<MovieDb> searchFilmByName(String filmName) {
+    public static List<MovieDb> searchFilmByName(String filmName, boolean adult) {
+        return searchFilmByName(filmName, 0, adult);
+    }
+
+    public static List<MovieDb> searchFilmByName(String filmName, int searchYear) {
+        return searchFilmByName(filmName, searchYear, false);
+    }
+
+    public static List<MovieDb> searchFilmByName(String filmName) {
         return searchFilmByName(filmName, 0, false);
     }
 
-    public List<MovieDb> searchActorFilmography(String actorName, boolean adultEnable) {
+    public static List<MovieDb> searchActorFilmography(String actorName, boolean adultEnable) {
         if (actorName.length() > 0) {
             TmdbPeople.PersonResultsPage resultActors = generalSearchService.searchPerson(actorName, adultEnable, 0);
             if (resultActors.getResults().size() > 0) {
@@ -80,7 +82,7 @@ public class CineMatesTheMovieDB {
             return new ArrayList<>();
     }
 
-    public List<MovieDb> searchActorFilmography(String actorName) {
+    public static List<MovieDb> searchActorFilmography(String actorName) {
         return searchActorFilmography(actorName, false);
     }
 

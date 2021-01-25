@@ -2,38 +2,3 @@ u:BackEnd
 p:IngSw2020!
 s:Cinemates20
 port:3306
-key:cc5fb6d50718c39062251de8b4d2995c
-
-
-        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.6.6</version>
-        </dependency>
-
-
-        <!--  https://mvnrepository.com/artifact/com.google.common/google-collect  -->
-        <dependency>
-            <groupId>com.google.common</groupId>
-            <artifactId>google-collect</artifactId>
-            <version>0.5</version>
-        </dependency>
-        <!--  https://mvnrepository.com/artifact/com.google.guava/guava  -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>18.0</version>
-        </dependency>
-        <!--  https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient  -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.3.6</version>
-        </dependency>
-        <!--  https://mvnrepository.com/artifact/org.yamj/api-common  -->
-        <dependency>
-            <groupId>org.yamj</groupId>
-            <artifactId>api-common</artifactId>
-            <version>1.0</version>
-        </dependency>

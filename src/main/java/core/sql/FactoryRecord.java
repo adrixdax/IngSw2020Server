@@ -50,10 +50,10 @@ public class FactoryRecord {
 
         String select = "select * from " + c.getSimpleName() + " " + whereclausule;
         try {
+            System.out.println(select);
             Statement st;
             assert cnn != null;
             st = cnn.createStatement();
-            System.out.println(select);
             ResultSet rs = st.executeQuery(select);
             if (rs.next()) {
                 onj = (AbstractSQLRecord) c.newInstance();
