@@ -18,7 +18,6 @@ public class StartClass {
         SpringApplication.run(SpringController.class, args);
         DbConnectionForBackEnd db = new DbConnectionForBackEnd();
         db.test();
-        //CineMatesTheMovieDB TheMovieDBAPI = new CineMatesTheMovieDB();
         List<MovieDb> actorFilmography = CineMatesTheMovieDB.searchActorFilmography("Bonnie Wright");
         System.out.println("Size: " + actorFilmography.size());
         String film = JSONCreation.getJSONToCreate(actorFilmography);
