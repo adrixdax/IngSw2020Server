@@ -47,10 +47,6 @@ public class DbConnectionForBackEnd {
         }
     }
 
-    private void constructLink() {
-
-    }
-
     public boolean createConnection() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");

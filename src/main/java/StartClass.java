@@ -1,12 +1,15 @@
 import DataBase.DbConnectionForBackEnd;
 import MovieDB.CineMatesTheMovieDB;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import core.Classes.User;
 import core.sql.FactoryRecord;
 import info.movito.themoviedbapi.model.MovieDb;
 import org.springframework.boot.SpringApplication;
 import spring.SpringController;
-import utility.Json.JSONCreation;
+import utility.Json.Creation.JSONCreation;
+import utility.Json.Decode.JSONDecoder;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +34,17 @@ public class StartClass {
         users.add(u2);
         String anotherjson = JSONCreation.getJSONToCreate(users);
         System.out.println(anotherjson);
+        String test = JSONCreation.getJSONToCreate(u);
+        User testingUser;
 
+        try {
+            testingUser = (User) JSONDecoder.getDecodedJson(test);
+            for (Field field : testingUser.getClass().getDeclaredFields()){
+                System.out.println(testingUser.getNick());
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
 }

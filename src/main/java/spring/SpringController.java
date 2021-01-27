@@ -8,7 +8,7 @@ import core.sql.FactoryRecord;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import utility.Json.JSONCreation;
+import utility.Json.Creation.JSONCreation;
 
 import java.sql.Connection;
 import java.sql.SQLException;
