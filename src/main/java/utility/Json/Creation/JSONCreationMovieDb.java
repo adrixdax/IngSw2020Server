@@ -1,6 +1,5 @@
 package utility.Json.Creation;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -22,7 +21,7 @@ class JSONCreationMovieDb {
 
     public static com.fasterxml.jackson.databind.node.ObjectNode getJsonActorList(List<PersonCast> instance, ObjectMapper mapper) {
         com.fasterxml.jackson.databind.node.ObjectNode actorList = mapper.createObjectNode();
-        for (int i = 0; i < instance.size(); i++) {
+        for (int i = 0; i < instance.size() && i<5; i++) {
             actorList.put("actor" + (i + 1), getJsonActorInfo(instance.get(i), mapper));
         }
         return actorList;
@@ -54,7 +53,12 @@ class JSONCreationMovieDb {
         }
         film.put("release_Date", toConvert.getReleaseDate());
         film.put("runtime", toConvert.getRuntime());
-        film.put("genres", getJsonGenreList(toConvert.getGenres(), mapper));
+        if (toConvert.getGenres().size()>0) {
+            film.put("genres", getJsonGenreList(toConvert.getGenres(), mapper));
+        }
+        else{
+            film.put("genres","");
+        }
         if (toConvert.getCast() != null) {
             film.put("cast", getJsonActorList(toConvert.getCast(), mapper));
         } else {
@@ -80,7 +84,7 @@ class JSONCreationMovieDb {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return null;
+        return "{}";
     }
 
 

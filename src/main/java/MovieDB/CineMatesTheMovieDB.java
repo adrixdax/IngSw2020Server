@@ -11,6 +11,7 @@ import info.movito.themoviedbapi.model.people.PersonCredit;
 import info.movito.themoviedbapi.model.people.PersonCredits;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
 
@@ -26,16 +27,16 @@ public class CineMatesTheMovieDB {
 
     public static List<MovieDb> searchFilmByName(String filmName, int searchYear, boolean adultEnable) {
         if (filmName.length() > 0) {
-            MovieResultsPage newmovies = generalSearchService.searchMovie(filmName, searchYear, "it", adultEnable, 0);
-            if (newmovies.getTotalResults() > 0) {
-                List<MovieDb> films = new ArrayList<>();
-                for (int i = 0; i < newmovies.getResults().size(); i++) {
-                    films.add(searchFilmById(newmovies.getResults().get(i).getId()));
+            List<MovieDb> films = new ArrayList<>();
+                MovieResultsPage newmovies = generalSearchService.searchMovie(filmName, searchYear, "it", adultEnable, 0);
+                if (newmovies.getTotalResults() > 0) {
+                    for (int j = 0; j < newmovies.getResults().size(); j++) {
+                        films.add(searchFilmById(newmovies.getResults().get(j).getId()));
+                    }
                 }
-                return films;
-            } else
-                return new ArrayList<>();
-        } else
+            return films;
+        }
+    else
             return new ArrayList<>();
     }
 

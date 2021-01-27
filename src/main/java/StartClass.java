@@ -36,7 +36,7 @@ public class StartClass {
         System.out.println(anotherjson);
         String test = JSONCreation.getJSONToCreate(u);
         User testingUser;
-        try {
+        /*try {
             testingUser = (User) JSONDecoder.getDecodedJson(test);
             for (Field field : testingUser.getClass().getDeclaredFields()){
                 System.out.println(testingUser.getNick());
@@ -44,6 +44,8 @@ public class StartClass {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
+
+         */
     }
 
 }

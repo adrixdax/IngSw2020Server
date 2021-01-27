@@ -3,17 +3,25 @@ package spring;
 
 import DataBase.DbConnectionForBackEnd;
 import MovieDB.CineMatesTheMovieDB;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import core.Classes.User;
+import core.Classes.reviews;
 import core.Classes.userlist;
 import core.sql.FactoryRecord;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import utility.Json.Creation.JSONCreation;
+import utility.Json.Decode.JSONDecoder;
+import utility.Json.Requests.HTTPRequest;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import static MovieDB.CineMatesTheMovieDB.searchActorFilmography;
 import static MovieDB.CineMatesTheMovieDB.searchFilmByName;
@@ -54,36 +62,54 @@ public class SpringController {
     //ip:8080/user?nickname=nick
     //ip:8080/user?user=iduserRequestingContactList
 
-    @GetMapping(value = "/film")
+    @PostMapping(value = "/film")  //verificare se è il caso di farla diventare una POST
     @ResponseBody
-    public String film(@RequestParam Map<String, String> query) {
-        if (query.containsKey("filmId"))
-            return JSONCreation.getJSONToCreate(CineMatesTheMovieDB.searchFilmById(Integer.parseInt(query.get("filmId"))));
-        if (query.containsKey("year") && query.containsKey("adult"))
-            return JSONCreation.getJSONToCreate(searchFilmByName(query.get("name"), Integer.parseInt(query.get("year")), Boolean.parseBoolean(query.get("adult"))));
-        else {
-            if (query.containsKey("year"))
-                return JSONCreation.getJSONToCreate(searchFilmByName(query.get("name"), Integer.parseInt(query.get("year"))));
-            else if (query.containsKey("adult"))
-                return JSONCreation.getJSONToCreate(searchFilmByName(query.get("name"), Boolean.parseBoolean(query.get("adult"))));
-            else
-                return JSONCreation.getJSONToCreate(searchFilmByName(query.get("name")));
+    public String film(@RequestBody String query) {
+        HTTPRequest request = null;
+        try {
+            request = (HTTPRequest) JSONDecoder.getDecodedJson(query);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
+        assert request != null;
+        Map<String, String> myMap = request.getMap();
+            if (myMap.containsKey("filmId"))
+                return JSONCreation.getJSONToCreate(CineMatesTheMovieDB.searchFilmById(Integer.parseInt(myMap.get("filmId"))));
+            if (myMap.containsKey("year") && myMap.containsKey("adult")) {
+                String str = JSONCreation.getJSONToCreate(searchFilmByName(myMap.get("name"), Integer.parseInt(myMap.get("year")), Boolean.parseBoolean(myMap.get("adult"))));
+                System.out.println(str);
+                return str;
+            }
+            else {
+                if (myMap.containsKey("year"))
+                    return JSONCreation.getJSONToCreate(searchFilmByName(myMap.get("name"), Integer.parseInt(myMap.get("year"))));
+                else if (myMap.containsKey("adult"))
+                    return JSONCreation.getJSONToCreate(searchFilmByName(myMap.get("name"), Boolean.parseBoolean(myMap.get("adult"))));
+                else
+                    return JSONCreation.getJSONToCreate(searchFilmByName(myMap.get("name")));
+            }
     }
-
     //ip:8080/film?filmId=id
     //ip:8080/film?name=name
     //ip:8080/film?name=name&adult=true
     //ip:8080/film?name=name&year=0000
     //ip:8080/film?name=name&year=0000&adult=false
 
-    @GetMapping(value = "/actor")
+    @PostMapping(value = "/actor")
     @ResponseBody
-    public String actor(@RequestParam Map<String, String> query) {
-        if (query.containsKey("adult"))
-            return JSONCreation.getJSONToCreate(searchActorFilmography(String.valueOf(query.get("name")), Boolean.parseBoolean(query.get("adult"))));
+    public String actor(@RequestBody String query) {
+        HTTPRequest request = null;
+        try {
+            request = (HTTPRequest) JSONDecoder.getDecodedJson(query);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        assert request != null;
+        Map<String, String> myMap = request.getMap();
+        if (myMap.containsKey("adult"))
+            return JSONCreation.getJSONToCreate(searchActorFilmography(String.valueOf(myMap.get("name")), Boolean.parseBoolean(myMap.get("adult"))));
         else
-            return JSONCreation.getJSONToCreate(searchActorFilmography(String.valueOf(query.get("name"))));
+            return JSONCreation.getJSONToCreate(searchActorFilmography(String.valueOf(myMap.get("name"))));
     }
 
     //ip:8080/actor?name=name
@@ -93,22 +119,21 @@ public class SpringController {
     @GetMapping(value = "/review")
     @ResponseBody
     public String review(@RequestParam Map<String, String> query) {
-        if (query.containsKey("filmId")) {
-//            return JSONCreation.getJSONToCreate(/**recover review for film from db**/);
+        if (query.containsKey("idFilm")) {
+            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class,"idFilm="+query.get("idFilm")));
         }else {
-//            return JSONCreation.getJSONToCreate(/**recover user reviews**/);
+            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn,reviews.class,"iduser="+query.get("iduser")));
         }
-        return "";
     }
 
     //ip:8080/review?filmId=id
-    //ip:8080/review?userId=id
+    //ip:8080/review?iduser=id
 
 
     @GetMapping(value = "/list")
     @ResponseBody
     public String list(@RequestParam Map<String, String> query) {
-        return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, userlist.class,"userId="+query.get("userId")));
+        return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, userlist.class,"idUser="+query.get("idUser")));
     }
 
     //ip:8080/list?userId=id

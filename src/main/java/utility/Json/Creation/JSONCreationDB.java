@@ -1,49 +1,24 @@
 package utility.Json.Creation;
 
+import MovieDB.CineMatesTheMovieDB;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import core.Classes.User;
+import core.Classes.filminlist;
+import core.Classes.reviews;
+import core.Classes.userlist;
+import core.sql.AbstractSQLRecord;
+import core.sql.FactoryRecord;
 import core.sql.MySqlAnnotation;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 class JSONCreationDB {
- /*
-    public static ObjectNode getJSONList(UserList instance, ObjectMapper mapper){
-        ObjectNode node = mapper.createObjectNode();
-        node.put("IdUserList", instance.getIdUserList());
-        node.put("title", instance.getTitle());
-        node.put("description", instance.getDescription());
-        for (int i = 0; i<instance.getListOfFilmId().size(); i++){
-            node.put("film"+(i+1),JSONCreationMovieDb.getJsonFilmInfo(CineMatesTheMovieDB.searchFilmById(Integer.parseInt(instance.getListOfFilmId().get(i))),mapper));
-        }
-        return node;
-    }
-
-    public static String getJSONUserLists(Object instance, ObjectMapper mapper){
-        try{
-            List<UserList> list = (List<UserList>) instance;
-            ObjectNode listOfList = mapper.createObjectNode();
-            listOfList.put("CustomLists","");
-            for (int i = 0; i< list.size(); i++)
-                listOfList.put("Custom"+(i+1),getJSONList(list.get(i), mapper));
-            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(listOfList);
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return "";
-    }
-
-    public static String getJsonReviews(Object instance, ObjectMapper mapper){
-        return "";
-    }
-*/
-
 
     public static ObjectNode getJsonUser(Object instance, ObjectMapper mapper) {
         User toConvert = (User) instance;
@@ -74,6 +49,75 @@ class JSONCreationDB {
         } catch (JsonProcessingException ex) {
             ex.printStackTrace();
         }
-        return "";
+        return "{}";
+    }
+
+    public static ObjectNode getJsonReview(Object instance, ObjectMapper mapper){
+        reviews review = (core.Classes.reviews) instance;
+        System.out.println(review.getIdFilm()+" "+review.getId_review());
+        ObjectNode node = mapper.createObjectNode();
+        for (Field field : review.getClass().getDeclaredFields()) {
+            try {
+                if (field.getAnnotation(MySqlAnnotation.class) != null) {
+                    String attribute = field.getName();
+                    attribute = attribute.replaceFirst(String.valueOf(attribute.charAt(0)), String.valueOf(Character.toUpperCase(attribute.charAt(0))));
+                    Method m = review.getClass().getMethod("get" + attribute);
+                    node.put(field.getName(), String.valueOf(m.invoke(review)));
+                }
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return node;
+    }
+
+    public static String getJsonListOfReviews(Object instance, ObjectMapper mapper) {
+        try {
+            List<reviews> list = (List<reviews>) instance;
+            ObjectNode node = mapper.createObjectNode();
+            for (int i = 0; i < list.size(); i++) {
+                node.put("review" + (i + 1), getJsonReview(list.get(i), mapper));
+            }
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+        } catch (JsonProcessingException ex) {
+            ex.printStackTrace();
+        }
+        return "{}";
+    }
+
+    public static ObjectNode getJsonSingleList(userlist instance, ObjectMapper mapper){
+        ObjectNode node = mapper.createObjectNode();
+        for (Field field : instance.getClass().getDeclaredFields()) {
+            try {
+                if (field.getAnnotation(MySqlAnnotation.class) != null) {
+                    String attribute = field.getName();
+                    attribute = attribute.replaceFirst(String.valueOf(attribute.charAt(0)), String.valueOf(Character.toUpperCase(attribute.charAt(0))));
+                    Method m = instance.getClass().getMethod("get" + attribute);
+                    node.put(field.getName(), String.valueOf(m.invoke(instance)));
+                }
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
+                ex.printStackTrace();
+            }
+        }
+        List<AbstractSQLRecord> filmlist=FactoryRecord.getNewIstance(instance.getSql_connection()).getListOfRecord(instance.getSql_connection(),filminlist.class,"idList="+instance.getIdUserList());
+        for (int i = 0; i< filmlist.size();i++) {
+            node.put("film"+(i+1), JSONCreationMovieDb.getJsonFilmInfo(CineMatesTheMovieDB.searchFilmById(((filminlist) filmlist.get(i)).getIdFilm()),mapper));
+        }
+        return node;
+    }
+
+
+    public static String getJsonUserList(ArrayList<?> instance, ObjectMapper mapper) {
+        try {
+            List<userlist> list = (List<userlist>) instance;
+            ObjectNode node = mapper.createObjectNode();
+            for (int i = 0; i < list.size(); i++) {
+                node.put("list" + (i + 1), getJsonSingleList(list.get(i), mapper));
+            }
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+        } catch (JsonProcessingException ex) {
+            ex.printStackTrace();
+        }
+        return "{}";
     }
 }

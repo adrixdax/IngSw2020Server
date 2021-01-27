@@ -35,11 +35,11 @@ public class JSONCreation {
                             return JSONCreationMovieDb.getJSONFilmList(instance, mapper);
                         } else {
                             switch (list.get(0).getClass().getSimpleName()) {
-                                case "UserList": {
-                                    //return getJSONUserLists(list,mapper);
+                                case "userlist": {
+                                    return JSONCreationDB.getJsonUserList(list,mapper);
                                 }
-                                case "Review": {
-
+                                case "reviews": {
+                                    return JSONCreationDB.getJsonListOfReviews(list,mapper);
                                 }
                                 case "User": {
                                     return JSONCreationDB.getJsonListOfUsers(list, mapper);
