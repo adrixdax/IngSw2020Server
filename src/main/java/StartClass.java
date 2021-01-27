@@ -36,7 +36,6 @@ public class StartClass {
         System.out.println(anotherjson);
         String test = JSONCreation.getJSONToCreate(u);
         User testingUser;
-
         try {
             testingUser = (User) JSONDecoder.getDecodedJson(test);
             for (Field field : testingUser.getClass().getDeclaredFields()){

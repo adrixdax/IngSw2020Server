@@ -4,6 +4,7 @@ package spring;
 import DataBase.DbConnectionForBackEnd;
 import MovieDB.CineMatesTheMovieDB;
 import core.Classes.User;
+import core.Classes.userlist;
 import core.sql.FactoryRecord;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.stereotype.Controller;
@@ -37,7 +38,7 @@ public class SpringController {
         if (query.containsKey("nickname")) {
             try {
                 if ((conn != null) && (!conn.isClosed())) {
-                    return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getSingleRecord(conn, User.class, "nick like '%" + query.get("nickname") + "%'"));
+                    return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, User.class, "nick like '%" + query.get("nickname") + "%'"));
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -107,8 +108,7 @@ public class SpringController {
     @GetMapping(value = "/list")
     @ResponseBody
     public String list(@RequestParam Map<String, String> query) {
-//        return JSONCreation.getJSONToCreate(/**user lists**/);
-        return "";
+        return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, userlist.class,"userId="+query.get("userId")));
     }
 
     //ip:8080/list?userId=id
