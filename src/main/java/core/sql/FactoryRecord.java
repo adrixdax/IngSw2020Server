@@ -11,6 +11,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -69,6 +71,42 @@ public class FactoryRecord {
         }
 
         return onj;
+    }
+
+    public List<AbstractSQLRecord> getListOfRecord(Connection cnn_sql, Class c, String whereclausule){
+
+        Connection cnn = null;
+        if (cnn_sql != null) {
+            cnn = cnn_sql;
+        }
+
+        AbstractSQLRecord onj = null;
+        if (!whereclausule.isEmpty()) {
+            whereclausule = "where " + whereclausule.replaceFirst("where", "");
+        }
+
+        List<AbstractSQLRecord> listOfRecord= new ArrayList<>();
+
+        String select = "select * from " + c.getSimpleName() + " " + whereclausule;
+        try {
+            Statement st;
+            st = cnn.createStatement();
+            ResultSet rs = st.executeQuery(select);
+            while (rs.next()) {
+                onj = (AbstractSQLRecord) c.newInstance();
+                onj.setSql_connection(cnn);
+                MySQLUtility.getNewIstance(cnn).LoadFieldFromResultSet(onj, rs);
+                listOfRecord.add(onj);
+            }
+
+            rs.close();
+            st.close();
+
+        } catch (SQLException | InstantiationException | IllegalAccessException ex) {
+            Logger.getLogger(FactoryRecord.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return listOfRecord;
     }
 
 }
