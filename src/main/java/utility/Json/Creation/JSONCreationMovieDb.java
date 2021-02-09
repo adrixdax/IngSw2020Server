@@ -16,6 +16,8 @@ class JSONCreationMovieDb {
     public static com.fasterxml.jackson.databind.node.ObjectNode getJsonActorInfo(PersonCast instance, ObjectMapper mapper) {
         com.fasterxml.jackson.databind.node.ObjectNode actorNode = mapper.createObjectNode();
         actorNode.put("name", instance.getName());
+        actorNode.put("character",instance.getCharacter());
+        actorNode.put("link",firstPartOfPath+instance.getProfilePath());
         return actorNode;
     }
 
@@ -76,7 +78,7 @@ class JSONCreationMovieDb {
         try {
             List<MovieDb> list = (List<MovieDb>) instance;
             ObjectNode filmList = mapper.createObjectNode();
-            filmList.put("id_List", instance.getClass().getSimpleName());
+            filmList.put("id_List", instance.getClass().getField("idList").toString());
             for (int i = 0; i < list.size(); i++) {
                 filmList.put("film" + (i + 1), getJsonFilmInfo(list.get(i), mapper));
             }

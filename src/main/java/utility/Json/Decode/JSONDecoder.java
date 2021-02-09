@@ -14,10 +14,11 @@ public class JSONDecoder {
     public static Object getDecodedJson(String json) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         if (json.contains("Type=PostRequest")){
-            return new HTTPRequest(json.substring(json.indexOf('&')+1));
+            return new HTTPRequest(json.substring(json.indexOf('&')+1),"Post");
         }
-        else{
-            return new Object();
+        if (json.contains("Type=PutRequest")){
+            return new HTTPRequest(json.substring(json.indexOf('&')+1),"Put");
         }
+        return null;
     }
 }

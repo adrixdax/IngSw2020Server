@@ -4,12 +4,9 @@ package spring;
 import DataBase.DbConnectionForBackEnd;
 import MovieDB.CineMatesTheMovieDB;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import core.Classes.User;
-import core.Classes.reviews;
-import core.Classes.userlist;
+import core.Classes.*;
 import core.sql.FactoryRecord;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import utility.Json.Creation.JSONCreation;
@@ -18,12 +15,10 @@ import utility.Json.Requests.HTTPRequest;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
-import static MovieDB.CineMatesTheMovieDB.searchActorFilmography;
 import static MovieDB.CineMatesTheMovieDB.searchFilmByName;
 
 
@@ -42,7 +37,7 @@ public class SpringController {
 
     @GetMapping(value = "/user")
     @ResponseBody
-    public String user(@RequestParam Map<String, String> query) {
+    public String user(@org.jetbrains.annotations.NotNull @RequestParam Map<String, String> query) {
         if (query.containsKey("nickname")) {
             try {
                 if ((conn != null) && (!conn.isClosed())) {
@@ -52,9 +47,15 @@ public class SpringController {
                 ex.printStackTrace();
             }
         } else {
-            //key will be user instead of nickname
-            //contact list of user wich passed ID
-            return "";
+            try {
+                if ((conn != null) && (!conn.isClosed())) {
+                    List<String> columns = new ArrayList<>();
+                    columns.add("user2");
+                    return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfFilteredRecord(conn, Contact.class, columns," user2="+query.get("IdUser"))+" union (select user2 from Cinemates20Development.Contact where user1=2)" + query.get("nickname") + "%'");
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
         return "";
     }
@@ -94,26 +95,6 @@ public class SpringController {
     //ip:8080/film?name=name&adult=true
     //ip:8080/film?name=name&year=0000
     //ip:8080/film?name=name&year=0000&adult=false
-
-    @PostMapping(value = "/actor")
-    @ResponseBody
-    public String actor(@RequestBody String query) {
-        HTTPRequest request = null;
-        try {
-            request = (HTTPRequest) JSONDecoder.getDecodedJson(query);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        assert request != null;
-        Map<String, String> myMap = request.getMap();
-        if (myMap.containsKey("adult"))
-            return JSONCreation.getJSONToCreate(searchActorFilmography(String.valueOf(myMap.get("name")), Boolean.parseBoolean(myMap.get("adult"))));
-        else
-            return JSONCreation.getJSONToCreate(searchActorFilmography(String.valueOf(myMap.get("name"))));
-    }
-
-    //ip:8080/actor?name=name
-    //ip:8080/actor?name=name&adult=value
 
 
     @GetMapping(value = "/review")
