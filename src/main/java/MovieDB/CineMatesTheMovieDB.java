@@ -46,5 +46,16 @@ public class CineMatesTheMovieDB {
         return searchFilmByName(filmName, 0, false);
     }
 
+    public static List<MovieDb> comingSoon(){
+        int value=singleMovieSearch.getUpcoming("it",0,"").getTotalResults();
+        ArrayList<MovieDb> list = new ArrayList<>();
+        //list= (ArrayList<MovieDb>) singleMovieSearch.getUpcoming("it",0,"").getResults();
+        for (int i=0; i<10; i++){
+            list.add(singleMovieSearch.getUpcoming("it",0,"").getResults().get(i));
+        }
+
+        return list;
+    }
+
 }
 

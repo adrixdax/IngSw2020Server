@@ -30,6 +30,7 @@ public class JSONCreation {
                 }
                 case "ArrayList": {
                     ArrayList<Object> list = (ArrayList<Object>) instance;
+                    System.out.println(list.get(0).getClass().getSimpleName());
                     if (list.size() > 0) {
                         if (list.get(0).getClass().getSimpleName().equals("MovieDb")) {
                             return JSONCreationMovieDb.getJSONFilmList(instance, mapper);
@@ -43,6 +44,9 @@ public class JSONCreation {
                                 }
                                 case "User": {
                                     return JSONCreationDB.getJsonListOfUsers(list, mapper);
+                                }
+                                case "Contact": {
+                                    return JSONCreationDB.getJsonContact(list,mapper);
                                 }
                             }
                         }

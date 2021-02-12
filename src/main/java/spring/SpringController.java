@@ -49,9 +49,7 @@ public class SpringController {
         } else {
             try {
                 if ((conn != null) && (!conn.isClosed())) {
-                    List<String> columns = new ArrayList<>();
-                    columns.add("user2");
-                    return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfFilteredRecord(conn, Contact.class, columns," user2="+query.get("IdUser"))+" union (select user2 from Cinemates20Development.Contact where user1=2)" + query.get("nickname") + "%'");
+                    return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Contact.class, "where user2="+query.get("IdUser")+" union (select * from Contact where user1=2)"));
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -74,6 +72,9 @@ public class SpringController {
         }
         assert request != null;
         Map<String, String> myMap = request.getMap();
+        if (myMap.containsKey("latest") && myMap.get("latest").equals("true")){
+            return JSONCreation.getJSONToCreate(CineMatesTheMovieDB.comingSoon());
+        }
             if (myMap.containsKey("filmId"))
                 return JSONCreation.getJSONToCreate(CineMatesTheMovieDB.searchFilmById(Integer.parseInt(myMap.get("filmId"))));
             if (myMap.containsKey("year") && myMap.containsKey("adult")) {

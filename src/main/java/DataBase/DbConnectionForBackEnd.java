@@ -54,8 +54,7 @@ public class DbConnectionForBackEnd {
             System.out.println("Status: " + (!con.isClosed()));
             String command = "use "+schema;
             PreparedStatement st = con.prepareStatement(command);
-            st.execute(command);
-            return true;
+            return st.execute(command);
         } catch (Exception ex) {
             //ex.printStackTrace();
             return false;

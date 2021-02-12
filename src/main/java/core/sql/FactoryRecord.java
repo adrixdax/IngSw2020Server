@@ -110,48 +110,5 @@ public class FactoryRecord {
         return listOfRecord;
     }
 
-    public List<AbstractSQLRecord> getListOfFilteredRecord(Connection cnn_sql, Class c,List<String> columns, String whereclausule){
-
-        Connection cnn = null;
-        if (cnn_sql != null) {
-            cnn = cnn_sql;
-        }
-
-        AbstractSQLRecord onj = null;
-        if (!whereclausule.isEmpty()) {
-            whereclausule = "where " + whereclausule.replaceFirst("where", "");
-        }
-
-        List<AbstractSQLRecord> listOfRecord= new ArrayList<>();
-
-        String select = "select ";
-        for (String column : columns) {
-            select = select + column + ",";
-        }
-        int last=select.indexOf(',',select.length()-2);
-        char[] substitute=select.toCharArray();
-        substitute[last]=' ';
-        select= Arrays.toString(substitute);
-        select=select+" from " + c.getSimpleName() + " " + whereclausule;
-        try {
-            Statement st;
-            st = cnn.createStatement();
-            ResultSet rs = st.executeQuery(select);
-            while (rs.next()) {
-                onj = (AbstractSQLRecord) c.newInstance();
-                onj.setSql_connection(cnn);
-                MySQLUtility.getNewIstance(cnn).LoadFieldFromResultSet(onj, rs);
-                listOfRecord.add(onj);
-            }
-
-            rs.close();
-            st.close();
-
-        } catch (SQLException | InstantiationException | IllegalAccessException ex) {
-            Logger.getLogger(FactoryRecord.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return listOfRecord;
-    }
 
 }

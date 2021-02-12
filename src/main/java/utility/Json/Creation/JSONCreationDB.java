@@ -1,13 +1,11 @@
 package utility.Json.Creation;
 
+import DataBase.DbConnectionForBackEnd;
 import MovieDB.CineMatesTheMovieDB;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import core.Classes.User;
-import core.Classes.filminlist;
-import core.Classes.reviews;
-import core.Classes.userlist;
+import core.Classes.*;
 import core.sql.AbstractSQLRecord;
 import core.sql.FactoryRecord;
 import core.sql.MySqlAnnotation;
@@ -113,6 +111,25 @@ class JSONCreationDB {
             ObjectNode node = mapper.createObjectNode();
             for (int i = 0; i < list.size(); i++) {
                 node.put("list" + (i + 1), getJsonSingleList(list.get(i), mapper));
+            }
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+        } catch (JsonProcessingException ex) {
+            ex.printStackTrace();
+        }
+        return "{}";
+    }
+
+    public static ObjectNode getJsonSingleContact(Contact user, ObjectMapper mapper){
+        User usernode = (User) FactoryRecord.getNewIstance(new DbConnectionForBackEnd().getConnection()).getSingleRecord(new DbConnectionForBackEnd().getConnection(),User.class,"where idUSer="+user.getUser1()+" or IdUSer="+user.getUser2());
+        return getJsonUser(usernode,mapper);
+    }
+
+    public static String getJsonContact(ArrayList<?> list, ObjectMapper mapper) {
+        try {
+            List<Contact> contacts = (List<Contact>) list;
+            ObjectNode node = mapper.createObjectNode();
+            for (int i = 0; i < list.size(); i++) {
+                node.put("user" + (i + 1), getJsonSingleContact((Contact) list.get(i), mapper));
             }
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
         } catch (JsonProcessingException ex) {

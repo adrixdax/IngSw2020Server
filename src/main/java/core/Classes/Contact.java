@@ -1,9 +1,10 @@
 package core.Classes;
 
+import core.sql.MySQLRecord;
 import core.sql.MySqlAnnotation;
 import utility.MySQLUtility;
 
-public class Contact {
+public class Contact extends MySQLRecord {
 
     @MySqlAnnotation(type = MySQLUtility.type_int)
     private int user1;
