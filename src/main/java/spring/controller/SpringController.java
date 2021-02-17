@@ -1,4 +1,4 @@
-package spring;
+package spring.controller;
 
 
 import DataBase.DbConnectionForBackEnd;
@@ -7,10 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import core.Classes.*;
 import core.sql.AbstractSQLRecord;
 import core.sql.FactoryRecord;
-import core.sql.MySQLRecord;
 import info.movito.themoviedbapi.model.MovieDb;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import utility.Json.Creation.JSONCreation;
 import utility.Json.Decode.JSONDecoder;
@@ -25,11 +22,11 @@ import java.util.Map;
 import static MovieDB.CineMatesTheMovieDB.searchFilmByName;
 
 
-@Controller
-@EnableAutoConfiguration
+@RestController
 public class SpringController {
 
     Connection conn;
+    CineMatesTheMovieDB CineMates;
 
     public SpringController() {
         DbConnectionForBackEnd db = new DbConnectionForBackEnd();

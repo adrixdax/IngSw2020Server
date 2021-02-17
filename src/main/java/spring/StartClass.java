@@ -1,24 +1,13 @@
-import DataBase.DbConnectionForBackEnd;
-import MovieDB.CineMatesTheMovieDB;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import core.Classes.User;
-import core.sql.FactoryRecord;
-import info.movito.themoviedbapi.model.MovieDb;
+package spring;
+
 import org.springframework.boot.SpringApplication;
-import spring.SpringController;
-import utility.Json.Creation.JSONCreation;
-import utility.Json.Decode.JSONDecoder;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-
-
+@SpringBootApplication
 public class StartClass {
 
-
     public static void main(String[] args) {
-        SpringApplication.run(SpringController.class, args);
+        SpringApplication.run(StartClass.class, args);
         //DbConnectionForBackEnd db = new DbConnectionForBackEnd();
         //db.test();
         /*List<MovieDb> actorFilmography = CineMatesTheMovieDB.searchActorFilmography("Bonnie Wright");
