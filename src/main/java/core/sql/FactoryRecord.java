@@ -91,6 +91,7 @@ public class FactoryRecord {
         String select = "select * from " + c.getSimpleName() + " " + whereclausule;
         try {
             Statement st;
+            assert cnn != null;
             st = cnn.createStatement();
             ResultSet rs = st.executeQuery(select);
             while (rs.next()) {

@@ -5,7 +5,10 @@ import DataBase.DbConnectionForBackEnd;
 import MovieDB.CineMatesTheMovieDB;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import core.Classes.*;
+import core.sql.AbstractSQLRecord;
 import core.sql.FactoryRecord;
+import core.sql.MySQLRecord;
+import info.movito.themoviedbapi.model.MovieDb;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -74,6 +77,14 @@ public class SpringController {
         Map<String, String> myMap = request.getMap();
         if (myMap.containsKey("latest") && myMap.get("latest").equals("true")){
             return JSONCreation.getJSONToCreate(CineMatesTheMovieDB.comingSoon());
+        }
+        if (myMap.containsKey("most") && myMap.get("most").equals("true")){
+            List<AbstractSQLRecord> sql = (FactoryRecord.getNewIstance(conn).getListOfRecord(conn,MostViewed.class,""));
+            List<MovieDb> movies = new ArrayList<>();
+            for (AbstractSQLRecord record : sql){
+                movies.add(CineMatesTheMovieDB.searchFilmById(((MostViewed)record).getIdFilm()));
+            }
+            return JSONCreation.getJSONToCreate(movies);
         }
             if (myMap.containsKey("filmId"))
                 return JSONCreation.getJSONToCreate(CineMatesTheMovieDB.searchFilmById(Integer.parseInt(myMap.get("filmId"))));
