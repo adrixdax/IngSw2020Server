@@ -89,6 +89,7 @@ public class FactoryRecord {
         List<AbstractSQLRecord> listOfRecord= new ArrayList<>();
 
         String select = "select * from " + c.getSimpleName() + " " + whereclausule;
+        System.out.println(select);
         try {
             Statement st;
             assert cnn != null;
