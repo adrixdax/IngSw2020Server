@@ -45,4 +45,9 @@ public class User extends MySQLRecord {
         this.nick = nick;
     }
 
+    @Override
+    public void afterRecordInsert() {
+
+    }
+
 }

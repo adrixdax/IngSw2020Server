@@ -2,8 +2,11 @@ package utility.Json.Creation;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import info.movito.themoviedbapi.model.MovieDb;
 
 import java.util.ArrayList;
+
+import static utility.Json.Creation.JSONCreationDB.getJsonListDB;
 
 public class JSONCreation {
 
@@ -11,52 +14,42 @@ public class JSONCreation {
     private static final ObjectMapper mapper = new ObjectMapper();
 
 
-    public static String getJSONToCreate(Object instance) {
+    private static String getJSONList(ArrayList<?> instance, String ClassToConvert) {
+        if (instance.size() > 0) {
+            if (ClassToConvert.equals("MovieDb")) {
+                return JSONCreationMovieDb.getJSONFilmList(instance, mapper);
+            } else {
+                return getJsonListDB(instance, mapper, ClassToConvert);
+            }
+        }
+        return "";
+    }
+
+
+    public static String getJSONToCreate(Object instance, String ClassToConvert) {
         if (instance != null) {
             switch (instance.getClass().getSimpleName()) {
                 case "MovieDb": {
                     try {
-                        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationMovieDb.getJsonFilmInfo(instance, mapper));
+                        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationMovieDb.getJsonFilmInfo((MovieDb) instance, mapper));
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                 }
                 case "User": {
                     try {
-                        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationDB.getJsonUser(instance, mapper));
-                    } catch (JsonProcessingException e) {
+                        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationDB.getJson(instance, mapper, ClassToConvert));
+                    } catch (JsonProcessingException | ClassNotFoundException e) {
                         e.printStackTrace();
                     }
                 }
                 case "ArrayList": {
-                    ArrayList<Object> list = (ArrayList<Object>) instance;
-                    System.out.println(list.get(0).getClass().getSimpleName());
-                    if (list.size() > 0) {
-                        if (list.get(0).getClass().getSimpleName().equals("MovieDb")) {
-                            return JSONCreationMovieDb.getJSONFilmList(instance, mapper);
-                        } else {
-                            switch (list.get(0).getClass().getSimpleName()) {
-                                case "userlist": {
-                                    return JSONCreationDB.getJsonUserList(list,mapper);
-                                }
-                                case "reviews": {
-                                    return JSONCreationDB.getJsonListOfReviews(list,mapper);
-                                }
-                                case "User": {
-                                    return JSONCreationDB.getJsonListOfUsers(list, mapper);
-                                }
-                                case "Contact": {
-                                    return JSONCreationDB.getJsonContact(list,mapper);
-                                }
-                            }
-                        }
-                    } else
-                        return "";
+                    return getJSONList((ArrayList<?>) instance, ClassToConvert);
                 }
             }
-            return json;
         } else {
             return "";
         }
+        return "";
     }
 }

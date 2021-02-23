@@ -1,138 +1,46 @@
 package utility.Json.Creation;
 
-import DataBase.DbConnectionForBackEnd;
-import MovieDB.CineMatesTheMovieDB;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import core.Classes.*;
-import core.sql.AbstractSQLRecord;
-import core.sql.FactoryRecord;
 import core.sql.MySqlAnnotation;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.List;
 
 class JSONCreationDB {
 
-    public static ObjectNode getJsonUser(Object instance, ObjectMapper mapper) {
-        User toConvert = (User) instance;
+    public static ObjectNode getJson(Object instance, ObjectMapper mapper, String ClassToconvert) throws ClassNotFoundException {
+        Class<?> act = Class.forName(ClassToconvert);
         ObjectNode node = mapper.createObjectNode();
-        for (Field field : toConvert.getClass().getDeclaredFields()) {
+        for (Field field : act.getDeclaredFields()) {
             try {
                 if (field.getAnnotation(MySqlAnnotation.class) != null) {
                     String attribute = field.getName();
                     attribute = attribute.replaceFirst(String.valueOf(attribute.charAt(0)), String.valueOf(Character.toUpperCase(attribute.charAt(0))));
-                    Method m = toConvert.getClass().getMethod("get" + attribute);
-                    node.put(field.getName(), String.valueOf(m.invoke(toConvert)));
-                }
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
-                ex.printStackTrace();
-            }
-        }
-        return node;
-    }
-
-    public static String getJsonListOfUsers(Object instance, ObjectMapper mapper) {
-        try {
-            List<User> list = (List<User>) instance;
-            ObjectNode node = mapper.createObjectNode();
-            for (int i = 0; i < list.size(); i++) {
-                node.put("user" + (i + 1), getJsonUser(list.get(i), mapper));
-            }
-            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
-        } catch (JsonProcessingException ex) {
-            ex.printStackTrace();
-        }
-        return "{}";
-    }
-
-    public static ObjectNode getJsonReview(Object instance, ObjectMapper mapper){
-        reviews review = (core.Classes.reviews) instance;
-        System.out.println(review.getIdFilm()+" "+review.getId_review());
-        ObjectNode node = mapper.createObjectNode();
-        for (Field field : review.getClass().getDeclaredFields()) {
-            try {
-                if (field.getAnnotation(MySqlAnnotation.class) != null) {
-                    String attribute = field.getName();
-                    attribute = attribute.replaceFirst(String.valueOf(attribute.charAt(0)), String.valueOf(Character.toUpperCase(attribute.charAt(0))));
-                    Method m = review.getClass().getMethod("get" + attribute);
-                    node.put(field.getName(), String.valueOf(m.invoke(review)));
-                }
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
-                ex.printStackTrace();
-            }
-        }
-        return node;
-    }
-
-    public static String getJsonListOfReviews(Object instance, ObjectMapper mapper) {
-        try {
-            List<reviews> list = (List<reviews>) instance;
-            ObjectNode node = mapper.createObjectNode();
-            for (int i = 0; i < list.size(); i++) {
-                node.put("review" + (i + 1), getJsonReview(list.get(i), mapper));
-            }
-            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
-        } catch (JsonProcessingException ex) {
-            ex.printStackTrace();
-        }
-        return "{}";
-    }
-
-    public static ObjectNode getJsonSingleList(userlist instance, ObjectMapper mapper){
-        ObjectNode node = mapper.createObjectNode();
-        for (Field field : instance.getClass().getDeclaredFields()) {
-            try {
-                if (field.getAnnotation(MySqlAnnotation.class) != null) {
-                    String attribute = field.getName();
-                    attribute = attribute.replaceFirst(String.valueOf(attribute.charAt(0)), String.valueOf(Character.toUpperCase(attribute.charAt(0))));
-                    Method m = instance.getClass().getMethod("get" + attribute);
+                    Method m = act.getMethod("get" + attribute);
                     node.put(field.getName(), String.valueOf(m.invoke(instance)));
                 }
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
                 ex.printStackTrace();
             }
         }
-        List<AbstractSQLRecord> filmlist=FactoryRecord.getNewIstance(instance.getSql_connection()).getListOfRecord(instance.getSql_connection(),filminlist.class,"idList="+instance.getIdUserList());
-        for (int i = 0; i< filmlist.size();i++) {
-            node.put("film"+(i+1), JSONCreationMovieDb.getJsonFilmInfo(CineMatesTheMovieDB.searchFilmById(((filminlist) filmlist.get(i)).getIdFilm()),mapper));
-        }
         return node;
     }
 
-
-    public static String getJsonUserList(ArrayList<?> instance, ObjectMapper mapper) {
+    public static String getJsonListDB(ArrayList<?> list, ObjectMapper mapper, String ClassesToConvert) {
         try {
-            List<userlist> list = (List<userlist>) instance;
+            ArrayNode arr = mapper.createArrayNode();
             ObjectNode node = mapper.createObjectNode();
-            for (int i = 0; i < list.size(); i++) {
-                node.put("list" + (i + 1), getJsonSingleList(list.get(i), mapper));
+            for (Object o : list) {
+                node.put(list.get(0).getClass().getSimpleName(), getJson(o, mapper, ClassesToConvert));
+                arr.add(node);
             }
-            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
-        } catch (JsonProcessingException ex) {
-            ex.printStackTrace();
-        }
-        return "{}";
-    }
-
-    public static ObjectNode getJsonSingleContact(Contact user, ObjectMapper mapper){
-        User usernode = (User) FactoryRecord.getNewIstance(new DbConnectionForBackEnd().getConnection()).getSingleRecord(new DbConnectionForBackEnd().getConnection(),User.class,"where idUSer="+user.getUser1()+" or IdUSer="+user.getUser2());
-        return getJsonUser(usernode,mapper);
-    }
-
-    public static String getJsonContact(ArrayList<?> list, ObjectMapper mapper) {
-        try {
-            List<Contact> contacts = (List<Contact>) list;
-            ObjectNode node = mapper.createObjectNode();
-            for (int i = 0; i < list.size(); i++) {
-                node.put("user" + (i + 1), getJsonSingleContact((Contact) list.get(i), mapper));
-            }
-            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
-        } catch (JsonProcessingException ex) {
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(arr);
+        } catch (JsonProcessingException | ClassNotFoundException ex) {
             ex.printStackTrace();
         }
         return "{}";

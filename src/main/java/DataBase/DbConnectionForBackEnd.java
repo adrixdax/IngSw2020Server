@@ -17,6 +17,16 @@ public class DbConnectionForBackEnd {
     private String schema = "Cinemates20Development";
     private final String version = "";
 
+    public DbConnectionForBackEnd() {
+
+    }
+
+    public DbConnectionForBackEnd(String user) {
+        this.user = user;
+        recoverPW();
+        recoverSchema();
+    }
+
     private void recoverUser() {
         try {
             Scanner myReader = new Scanner(config);

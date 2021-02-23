@@ -3,11 +3,11 @@ package utility.Json.Creation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import info.movito.themoviedbapi.model.Genre;
 import info.movito.themoviedbapi.model.MovieDb;
 import info.movito.themoviedbapi.model.people.PersonCast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 class JSONCreationMovieDb {
@@ -44,27 +44,25 @@ class JSONCreationMovieDb {
         return genreList;
     }
 
-    public static com.fasterxml.jackson.databind.node.ObjectNode getJsonFilmInfo(Object instance, ObjectMapper mapper) {
-        MovieDb toConvert = (MovieDb) instance;
+    public static com.fasterxml.jackson.databind.node.ObjectNode getJsonFilmInfo(MovieDb instance, ObjectMapper mapper) {
         com.fasterxml.jackson.databind.node.ObjectNode film = mapper.createObjectNode();
-        film.put("id_Film", toConvert.getId());
-        film.put("film_Title", toConvert.getTitle());
-        film.put("plot",toConvert.getOverview());
-        if (toConvert.getPosterPath() != null) {
-            film.put("posterPath", firstPartOfPath + toConvert.getPosterPath());
+        film.put("id_Film", instance.getId());
+        film.put("film_Title", instance.getTitle());
+        film.put("plot", instance.getOverview());
+        if (instance.getPosterPath() != null) {
+            film.put("posterPath", firstPartOfPath + instance.getPosterPath());
         } else {
             film.put("posterPath", "");
         }
-        film.put("release_Date", toConvert.getReleaseDate());
-        film.put("runtime", toConvert.getRuntime());
-        if ((toConvert.getCast() != null) && (toConvert.getGenres().size()>0)) {
-            film.put("genres", getJsonGenreList(toConvert.getGenres(), mapper));
+        film.put("release_Date", instance.getReleaseDate());
+        film.put("runtime", instance.getRuntime());
+        if ((instance.getCast() != null) && (instance.getGenres().size() > 0)) {
+            film.put("genres", getJsonGenreList(instance.getGenres(), mapper));
+        } else {
+            film.put("genres", "");
         }
-        else{
-            film.put("genres","");
-        }
-        if (toConvert.getCast() != null) {
-            film.put("cast", getJsonActorList(toConvert.getCast(), mapper));
+        if (instance.getCast() != null) {
+            film.put("cast", getJsonActorList(instance.getCast(), mapper));
         } else {
             film.put("cast", "");
         }
@@ -76,13 +74,10 @@ class JSONCreationMovieDb {
         return film;
     }
 
-    public static String getJSONFilmList(Object instance, ObjectMapper mapper) {
+    public static String getJSONFilmList(ArrayList<?> instance, ObjectMapper mapper) {
         try {
-            List<MovieDb> list = (List<MovieDb>) instance;
             ArrayNode filmList = mapper.createArrayNode();
-            for (MovieDb movieDb : list) {
-                filmList.add(getJsonFilmInfo(movieDb, mapper));
-            }
+            for (Object movieDb : instance) filmList.add(getJsonFilmInfo((MovieDb) movieDb, mapper));
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(filmList);
         } catch (Exception ex) {
             ex.printStackTrace();
