@@ -1,5 +1,6 @@
 package spring;
 
+import core.Classes.MostViewed;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

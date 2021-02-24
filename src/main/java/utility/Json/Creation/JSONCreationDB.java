@@ -36,8 +36,7 @@ class JSONCreationDB {
             ArrayNode arr = mapper.createArrayNode();
             ObjectNode node = mapper.createObjectNode();
             for (Object o : list) {
-                node.put(list.get(0).getClass().getSimpleName(), getJson(o, mapper, ClassesToConvert));
-                arr.add(node);
+                arr.add(getJson(o, mapper, ClassesToConvert));
             }
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(arr);
         } catch (JsonProcessingException | ClassNotFoundException ex) {
