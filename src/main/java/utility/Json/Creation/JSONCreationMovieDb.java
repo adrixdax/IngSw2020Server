@@ -30,16 +30,10 @@ class JSONCreationMovieDb {
         return actorList;
     }
 
-    public static com.fasterxml.jackson.databind.node.ObjectNode getJsonGenreInfo(Genre instance, ObjectMapper mapper) {
-        com.fasterxml.jackson.databind.node.ObjectNode genreNode = mapper.createObjectNode();
-        genreNode.put("name", instance.getName());
-        return genreNode;
-    }
-
     public static com.fasterxml.jackson.databind.node.ArrayNode getJsonGenreList(List<Genre> instance, ObjectMapper mapper) {
         com.fasterxml.jackson.databind.node.ArrayNode genreList = mapper.createArrayNode();
         for (Genre genre : instance) {
-            genreList.add(getJsonGenreInfo(genre, mapper));
+            genreList.add(genre.getName());
         }
         return genreList;
     }
