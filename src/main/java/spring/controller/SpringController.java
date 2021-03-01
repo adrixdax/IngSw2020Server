@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import utility.Json.Creation.JSONCreation;
 import utility.Json.Decode.JSONDecoder;
 import utility.Json.Requests.HTTPRequest;
+import utility.UserListType;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -39,7 +40,7 @@ public class SpringController {
 
     @GetMapping(value = "/user")
     @ResponseBody
-    public String user(@org.jetbrains.annotations.NotNull @RequestParam Map<String, String> query) {
+    public String user(@org.jetbrains.annotations.NotNull @RequestParam Map<String, String> query)  {
         if (query.containsKey("nickname")) {
             try {
                 if ((conn != null) && (!conn.isClosed())) {
@@ -62,6 +63,61 @@ public class SpringController {
 
     //ip:8080/user?nickname=nick
     //ip:8080/user?user=iduserRequestingContactList
+
+    @PostMapping(value = "/registration")
+    @ResponseBody
+    public String user(String query)  {
+        HTTPRequest request = null;
+        try {
+            System.out.println("Provaaaaaaaaa: "+query);
+            request = (HTTPRequest) JSONDecoder.getDecodedJson(query);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        assert request != null;
+        Map<String, String> myMap = request.getMap();
+        if(myMap.containsKey("registration")){
+            try {
+                if((conn != null) && (!conn.isClosed())){
+                    Userlist list = new Userlist();
+                    list.setIdUser(myMap.get("registration"));
+                    list.setDescription("Preferiti");
+                    list.setTitle("Preferiti");
+                    list.setType(UserListType.PREFERED.toString());
+                    list.addRecord();
+
+                    list = new Userlist();
+                    list.setIdUser(myMap.get("registration"));
+                    list.setDescription("Da Vedere");
+                    list.setTitle("Da Vedere");
+                    list.setType(UserListType.TOWATCH.toString());
+                    list.addRecord();
+
+                    list = new Userlist();
+                    list.setIdUser(myMap.get("registration"));
+                    list.setDescription("Personalizzate");
+                    list.setTitle("Personalizzate");
+                    list.setType(UserListType.CUSTOM.toString());
+                    list.addRecord();
+
+                    list = new Userlist();
+                    list.setIdUser(myMap.get("registration"));
+                    list.setDescription("Visti");
+                    list.setTitle("Visti");
+                    list.setType(UserListType.WATCH.toString());
+                    list.addRecord();
+
+                    return "Registrazione avvenuta con successo";
+
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+
+        return "";
+    }
+
 
     @PostMapping(value = "/film")  //verificare se è il caso di farla diventare una POST
     @ResponseBody
@@ -125,7 +181,7 @@ public class SpringController {
     @GetMapping(value = "/list")
     @ResponseBody
     public String list(@RequestParam Map<String, String> query) {
-        return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, userlist.class, "idUser=" + query.get("idUser")), userlist.class.getCanonicalName());
+        return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Userlist.class, "idUser=" + query.get("idUser")), Userlist.class.getCanonicalName());
     }
 
     //ip:8080/list?userId=id
