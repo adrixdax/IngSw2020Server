@@ -47,7 +47,7 @@ public class CineMatesTheMovieDB {
     }
 
     public static List<MovieDb> comingSoon(){
-        int value=singleMovieSearch.getUpcoming("it",0,"").getTotalResults();
+        int value=singleMovieSearch.getUpcoming("it",0,"EU").getTotalResults();
         ArrayList<MovieDb> list = new ArrayList<>();
         //list= (ArrayList<MovieDb>) singleMovieSearch.getUpcoming("it",0,"").getResults();
         for (int i=0; i<10; i++){
