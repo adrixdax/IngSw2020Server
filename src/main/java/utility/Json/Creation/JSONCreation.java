@@ -2,9 +2,11 @@ package utility.Json.Creation;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import core.sql.AbstractSQLRecord;
 import info.movito.themoviedbapi.model.MovieDb;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static utility.Json.Creation.JSONCreationDB.getJsonListDB;
 
@@ -52,4 +54,5 @@ public class JSONCreation {
         }
         return "";
     }
+
 }

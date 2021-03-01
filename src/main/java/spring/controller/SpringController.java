@@ -8,8 +8,7 @@ import core.Classes.*;
 import core.sql.AbstractSQLRecord;
 import core.sql.FactoryRecord;
 import info.movito.themoviedbapi.model.MovieDb;
-import info.movito.themoviedbapi.model.Reviews;
-import org.springframework.http.MediaType;
+import org.mockito.internal.matchers.Not;
 import org.springframework.web.bind.annotation.*;
 import utility.Json.Creation.JSONCreation;
 import utility.Json.Decode.JSONDecoder;
@@ -26,10 +25,10 @@ import static MovieDB.CineMatesTheMovieDB.searchFilmByName;
 
 
 @RestController
-@RequestMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class SpringController {
 
     Connection conn;
+    CineMatesTheMovieDB CineMates;
 
     public SpringController() {
         DbConnectionForBackEnd db = new DbConnectionForBackEnd();
@@ -44,7 +43,7 @@ public class SpringController {
         if (query.containsKey("nickname")) {
             try {
                 if ((conn != null) && (!conn.isClosed())) {
-                    return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, User.class, "nick like '%" + query.get("nickname") + "%'"), User.class.getCanonicalName());
+                    return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, User.class, "nick like '%" + query.get("nickname") + "%'"),User.class.getCanonicalName());
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -52,7 +51,7 @@ public class SpringController {
         } else {
             try {
                 if ((conn != null) && (!conn.isClosed())) {
-                    return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Contact.class, "where user2=" + query.get("IdUser") + " union (select * from Contact where user1=2)"), Contact.class.getCanonicalName());
+                    return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Contact.class, "where user2="+query.get("IdUser")+" union (select * from Contact where user1=2)"),Contact.class.getCanonicalName());
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -131,7 +130,7 @@ public class SpringController {
         assert request != null;
         Map<String, String> myMap = request.getMap();
         if (myMap.containsKey("latest") && myMap.get("latest").equals("true")){
-            return JSONCreation.getJSONToCreate(CineMatesTheMovieDB.comingSoon(), MovieDb.class.getSimpleName());
+            return JSONCreation.getJSONToCreate(CineMatesTheMovieDB.comingSoon(),MovieDb.class.getSimpleName());
         }
         if (myMap.containsKey("most") && myMap.get("most").equals("true")){
             List<AbstractSQLRecord> sql = (FactoryRecord.getNewIstance(conn).getListOfRecord(conn,MostViewed.class,""));
@@ -139,22 +138,22 @@ public class SpringController {
             for (AbstractSQLRecord record : sql){
                 movies.add(CineMatesTheMovieDB.searchFilmById(((MostViewed)record).getIdFilm()));
             }
-            return JSONCreation.getJSONToCreate(movies, MovieDb.class.getSimpleName());
+            return JSONCreation.getJSONToCreate(movies,MovieDb.class.getSimpleName());
         }
             if (myMap.containsKey("filmId"))
-                return JSONCreation.getJSONToCreate(CineMatesTheMovieDB.searchFilmById(Integer.parseInt(myMap.get("filmId"))), MovieDb.class.getSimpleName());
+                return JSONCreation.getJSONToCreate(CineMatesTheMovieDB.searchFilmById(Integer.parseInt(myMap.get("filmId"))),MovieDb.class.getSimpleName());
             if (myMap.containsKey("year") && myMap.containsKey("adult")) {
-                String str = JSONCreation.getJSONToCreate(searchFilmByName(myMap.get("name"), Integer.parseInt(myMap.get("year")), Boolean.parseBoolean(myMap.get("adult"))), MovieDb.class.getSimpleName());
+                String str = JSONCreation.getJSONToCreate(searchFilmByName(myMap.get("name"), Integer.parseInt(myMap.get("year")), Boolean.parseBoolean(myMap.get("adult"))),MovieDb.class.getSimpleName());
                 System.out.println(str);
                 return str;
             }
             else {
                 if (myMap.containsKey("year"))
-                    return JSONCreation.getJSONToCreate(searchFilmByName(myMap.get("name"), Integer.parseInt(myMap.get("year"))), MovieDb.class.getSimpleName());
+                    return JSONCreation.getJSONToCreate(searchFilmByName(myMap.get("name"), Integer.parseInt(myMap.get("year"))),MovieDb.class.getSimpleName());
                 else if (myMap.containsKey("adult"))
-                    return JSONCreation.getJSONToCreate(searchFilmByName(myMap.get("name"), Boolean.parseBoolean(myMap.get("adult"))), MovieDb.class.getSimpleName());
+                    return JSONCreation.getJSONToCreate(searchFilmByName(myMap.get("name"), Boolean.parseBoolean(myMap.get("adult"))),MovieDb.class.getSimpleName());
                 else
-                    return JSONCreation.getJSONToCreate(searchFilmByName(myMap.get("name")), MovieDb.class.getSimpleName());
+                    return JSONCreation.getJSONToCreate(searchFilmByName(myMap.get("name")),MovieDb.class.getSimpleName());
             }
     }
     //ip:8080/film?filmId=id
@@ -168,9 +167,9 @@ public class SpringController {
     @ResponseBody
     public String review(@RequestParam Map<String, String> query) {
         if (query.containsKey("idFilm")) {
-            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "idFilm=" + query.get("idFilm")), Reviews.class.getCanonicalName());
+            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class,"idFilm="+query.get("idFilm")),reviews.class.getCanonicalName());
         }else {
-            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "iduser=" + query.get("iduser")), Reviews.class.getCanonicalName());
+            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn,reviews.class,"iduser="+query.get("iduser")),reviews.class.getCanonicalName());
         }
     }
 
@@ -181,27 +180,47 @@ public class SpringController {
     @GetMapping(value = "/list")
     @ResponseBody
     public String list(@RequestParam Map<String, String> query) {
+<<<<<<< HEAD
         return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Userlist.class, "idUser=" + query.get("idUser")), Userlist.class.getCanonicalName());
+=======
+        return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, userlist.class,"idUser="+query.get("idUser")),userlist.class.getCanonicalName());
+    }
+
+    @GetMapping(value = "/notify")
+    @ResponseBody
+    public String notify(@RequestParam Map<String, String> query) {
+        List<Notify> list = new ArrayList<>();
+        List<AbstractSQLRecord> rec = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Notify.class,"id_receiver="+query.get("idUser"));
+        for (AbstractSQLRecord record : rec){
+            list.add((Notify) record);
+        }
+        for (Notify not : list){
+            System.out.println(not.getId_notify());
+        }
+        return JSONCreation.getJSONToCreate(list,Notify.class.getCanonicalName());
+>>>>>>> ec847f4b40ad0887fbc76bfde180f9fb961c4052
     }
 
     //ip:8080/list?userId=id
 
 
-    @GetMapping(value = "/todecide")
+    @PostMapping(value = "/todecide")
     @ResponseBody
-    public List<AbstractSQLRecord> insertFilm() {
-        return FactoryRecord.getNewIstance(conn).getListOfRecord(conn, User.class, "");
+    public String insertFilm(@RequestBody String json) {
+        System.out.println(json);
+        return json;
     }
 
+    @RequestMapping(value="/test")
+    public String test(){
+        List<Contact> cont = new ArrayList<>();
+        List<AbstractSQLRecord> rec = FactoryRecord.getNewIstance(conn).getListOfRecord(conn,Contact.class,"");
+        for (AbstractSQLRecord record : rec)
+            cont.add((Contact) record);
+        return new String("Hello World!");
+    }
     //ip:8080/insertFilm      json
     //better to build with HTTP Builder apache tomcat
     //mapping with application/json
-
-
-    /*
-    click notifica -> http message(id notifica, new status) -> obj notifica factory record(id) -> set status(status) -> not.update(id) ->
-    after update -> this.isStatus() f -> muore
-                                    t -> contact=new cont() contact.setusers() -> contact insert -> swap users() -> contact.insert()
-     */
 
 }
