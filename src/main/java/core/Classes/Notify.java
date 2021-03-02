@@ -8,10 +8,10 @@ public class Notify extends MySQLRecord {
 
     @MySqlAnnotation(type = MySQLUtility.type_int)
     int id_notify;
-    @MySqlAnnotation(type = MySQLUtility.type_int)
-    int id_sender;
-    @MySqlAnnotation(type = MySQLUtility.type_int)
-    int id_receiver;
+    @MySqlAnnotation(type = MySQLUtility.type_string)
+    String id_sender;
+    @MySqlAnnotation(type = MySQLUtility.type_string)
+    String id_receiver;
     @MySqlAnnotation(type = MySQLUtility.type_text)
     String type;
     @MySqlAnnotation(type = MySQLUtility.type_int)
@@ -28,19 +28,19 @@ public class Notify extends MySQLRecord {
         this.id_notify = id_notify;
     }
 
-    public int getId_sender() {
+    public String getId_sender() {
         return id_sender;
     }
 
-    public void setId_sender(int id_sender) {
+    public void setId_sender(String id_sender) {
         this.id_sender = id_sender;
     }
 
-    public int getId_receiver() {
+    public String getId_receiver() {
         return id_receiver;
     }
 
-    public void setId_receiver(int id_receiver) {
+    public void setId_receiver(String id_receiver) {
         this.id_receiver = id_receiver;
     }
 

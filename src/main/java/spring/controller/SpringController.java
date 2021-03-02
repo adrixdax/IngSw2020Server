@@ -181,15 +181,18 @@ public class SpringController {
     @GetMapping(value = "/notify")
     @ResponseBody
     public String notify(@RequestParam Map<String, String> query) {
+        System.out.println("Requested notify");
         List<Notify> list = new ArrayList<>();
-        List<AbstractSQLRecord> rec = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Notify.class,"id_receiver="+query.get("idUser"));
-        for (AbstractSQLRecord record : rec){
-            list.add((Notify) record);
-        }
-        for (Notify not : list){
-            System.out.println(not.getId_notify());
-        }
-        return JSONCreation.getJSONToCreate(list,Notify.class.getCanonicalName());
+        List<AbstractSQLRecord> rec = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Notify.class, "id_receiver='" + query.get("idUser") + "'");
+        if (rec.size() > 0) {
+            for (AbstractSQLRecord record : rec) {
+                list.add((Notify) record);
+            }
+            for (Notify not : list) {
+            }
+            return JSONCreation.getJSONToCreate(list, Notify.class.getCanonicalName());
+        } else
+            return "[]";
     }
 
     //ip:8080/list?userId=id
