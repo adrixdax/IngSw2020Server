@@ -64,20 +64,21 @@ public class SpringController {
 
     @PostMapping(value = "/registration")
     @ResponseBody
-    public String user(String query)  {
+    public String user(@RequestBody String query) {
         HTTPRequest request = null;
         try {
-            System.out.println("Provaaaaaaaaa: "+query);
+            System.out.println("Provaaaaaaaaa: " + query);
             request = (HTTPRequest) JSONDecoder.getDecodedJson(query);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
         assert request != null;
         Map<String, String> myMap = request.getMap();
-        if(myMap.containsKey("registration")){
+        if (myMap.containsKey("registration")) {
             try {
                 if((conn != null) && (!conn.isClosed())){
                     Userlist list = new Userlist();
+                    list.setSql_connection(conn);
                     list.setIdUser(myMap.get("registration"));
                     list.setDescription("Preferiti");
                     list.setTitle("Preferiti");
@@ -85,6 +86,7 @@ public class SpringController {
                     list.addRecord();
 
                     list = new Userlist();
+                    list.setSql_connection(conn);
                     list.setIdUser(myMap.get("registration"));
                     list.setDescription("Da Vedere");
                     list.setTitle("Da Vedere");
@@ -92,13 +94,7 @@ public class SpringController {
                     list.addRecord();
 
                     list = new Userlist();
-                    list.setIdUser(myMap.get("registration"));
-                    list.setDescription("Personalizzate");
-                    list.setTitle("Personalizzate");
-                    list.setType(UserListType.CUSTOM.toString());
-                    list.addRecord();
-
-                    list = new Userlist();
+                    list.setSql_connection(conn);
                     list.setIdUser(myMap.get("registration"));
                     list.setDescription("Visti");
                     list.setTitle("Visti");

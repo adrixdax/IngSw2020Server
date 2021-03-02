@@ -48,7 +48,7 @@ public class Userlist extends MySQLRecord {
         this.type = type;
     }
 
-    public String getIdUser(String registration) {
+    public String getIdUser() {
         return idUser;
     }
 
