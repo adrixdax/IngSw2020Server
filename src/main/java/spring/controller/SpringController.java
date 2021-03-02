@@ -8,7 +8,6 @@ import core.Classes.*;
 import core.sql.AbstractSQLRecord;
 import core.sql.FactoryRecord;
 import info.movito.themoviedbapi.model.MovieDb;
-import org.mockito.internal.matchers.Not;
 import org.springframework.web.bind.annotation.*;
 import utility.Json.Creation.JSONCreation;
 import utility.Json.Decode.JSONDecoder;
@@ -233,13 +232,16 @@ public class SpringController {
     public String notify(@RequestParam Map<String, String> query) {
         List<Notify> list = new ArrayList<>();
         List<AbstractSQLRecord> rec = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Notify.class, "id_receiver=" + query.get("idUser"));
-        for (AbstractSQLRecord record : rec) {
-            list.add((Notify) record);
-        }
-        for (Notify not : list) {
-            System.out.println(not.getId_notify());
-        }
-        return JSONCreation.getJSONToCreate(list, Notify.class.getCanonicalName());
+        if (rec.size() > 0) {
+            for (AbstractSQLRecord record : rec) {
+                list.add((Notify) record);
+            }
+            for (Notify not : list) {
+                System.out.println(not.getId_notify());
+            }
+            return JSONCreation.getJSONToCreate(list, Notify.class.getCanonicalName());
+        } else
+            return "[]";
     }
 
     //ip:8080/list?userId=id
@@ -258,7 +260,7 @@ public class SpringController {
         List<AbstractSQLRecord> rec = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Contact.class, "");
         for (AbstractSQLRecord record : rec)
             cont.add((Contact) record);
-        return new String("Hello World!");
+        return "Hello World!";
     }
     //ip:8080/insertFilm      json
     //better to build with HTTP Builder apache tomcat
