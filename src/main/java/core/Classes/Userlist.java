@@ -4,7 +4,7 @@ import core.sql.MySQLRecord;
 import core.sql.MySqlAnnotation;
 import utility.MySQLUtility;
 
-public class userlist extends MySQLRecord {
+public class Userlist extends MySQLRecord {
     @MySqlAnnotation(type = MySQLUtility.type_int)
     private int idUserList;
     @MySqlAnnotation(type = MySQLUtility.type_string)
@@ -13,8 +13,8 @@ public class userlist extends MySQLRecord {
     private String description;
     @MySqlAnnotation(type = MySQLUtility.type_string)
     private String type;
-    @MySqlAnnotation(type = MySQLUtility.type_int)
-    private int idUser;
+    @MySqlAnnotation(type = MySQLUtility.type_string)
+    private String idUser;
 
     public int getIdUserList() {
         return idUserList;
@@ -48,11 +48,12 @@ public class userlist extends MySQLRecord {
         this.type = type;
     }
 
-    public int getIdUser() {
+    public String getIdUser() {
         return idUser;
     }
 
-    public void setIdUser(int idUser) {
+    public void setIdUser(String idUser) {
         this.idUser = idUser;
     }
 }
+
