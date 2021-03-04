@@ -36,26 +36,39 @@ public class SpringController {
     }
 
 
-    @GetMapping(value = "/user")
+    @PostMapping(value = "/user")
     @ResponseBody
-    public String user(@org.jetbrains.annotations.NotNull @RequestParam Map<String, String> query) {
-        if (query.containsKey("nickname")) {
-            try {
-                if ((conn != null) && (!conn.isClosed())) {
-                    return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, User.class, "nick like '%" + query.get("nickname") + "%'"), User.class.getCanonicalName());
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        } else {
-            try {
-                if ((conn != null) && (!conn.isClosed())) {
-                    return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Contact.class, "where user2=" + query.get("IdUser") + " union (select * from Contact where user1=2)"), Contact.class.getCanonicalName());
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
+    public String user(@RequestBody String query) {
+        HTTPRequest request = null;
+        try {
+            System.out.println("Provaaaaaaaaa: " + query);
+            request = (HTTPRequest) JSONDecoder.getDecodedJson(query);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
+        assert request != null;
+        Map<String, String> myMap = request.getMap();
+        if (myMap.containsKey("idUser") && myMap.get("searchDefaultList").equals("true")) {
+            try {
+                if ((conn != null) && (!conn.isClosed())) {
+                    return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Userlist.class,
+                            "idUser = '" + myMap.get("idUser") + "' " +
+                                    " and (type='" + UserListType.PREFERED.toString() + "' " +
+                                    " OR type='" + UserListType.WATCH.toString() +
+                                    "' OR type='" + UserListType.TOWATCH.toString() + "' )"), Userlist.class.getCanonicalName());
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        } /*else {
+            try {
+                if ((conn != null) && (!conn.isClosed())) {
+                    return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Contact.class, "where user2=" + myMap.get("IdUser") + " union (select * from Contact where user1=2)"), Contact.class.getCanonicalName());
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }*/
         return "";
     }
 
@@ -253,6 +266,56 @@ public class SpringController {
         System.out.println(json);
         return json;
     }
+
+
+    @PostMapping(value = "/list")
+    @ResponseBody
+    public String list(@RequestBody String query) {
+        HTTPRequest request = null;
+        try {
+            System.out.println("Provaaaaaaaaa: " + query);
+            request = (HTTPRequest) JSONDecoder.getDecodedJson(query);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        assert request != null;
+        Map<String, String> myMap = request.getMap();
+        if (myMap.containsKey("idList") && myMap.containsKey("idFilm") && ((!myMap.containsKey("addFilm")) && (!myMap.containsKey("removeFilm")))) {
+            try {
+                if ((conn != null) && (!conn.isClosed())) {
+                    filminlist film = (filminlist) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, filminlist.class,
+                            "where idList='" + myMap.get("idList") + "' and idFilm='" + myMap.get("idFilm") + "' ");
+
+                    if (film != null) {
+                        return "true";
+                    } else {
+                        return "false";
+                    }
+
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        } else if (myMap.containsKey("idList") && myMap.containsKey("idFilm") && myMap.containsKey("addFilm") && myMap.get("addFilm").equals("true")) {
+
+            filminlist film = new filminlist();
+            film.setSql_connection(conn);
+            film.setIdFilm(Integer.parseInt(myMap.get("idFilm")));
+            film.setIdList(Integer.parseInt(myMap.get("idList")));
+            film.addRecord();
+            return "Film aggiunto con successo";
+
+        } else if (myMap.containsKey("idList") && myMap.containsKey("idFilm") && myMap.containsKey("removeFilm") && myMap.get("removeFilm").equals("true")) {
+            filminlist film = (filminlist) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, filminlist.class,
+                    "where idList='" + myMap.get("idList") + "' and idFilm='" + myMap.get("idFilm") + "' ");
+            if (film != null) {
+                film.deleteRecord();
+                return "Film eliminato con successo";
+            }
+        }
+        return "";
+    }
+
 
     @RequestMapping(value = "/test")
     public String test() {
