@@ -48,7 +48,7 @@ public class SpringController {
         }
         assert request != null;
         Map<String, String> myMap = request.getMap();
-        if (myMap.containsKey("idUser") && myMap.get("searchDefaultList").equals("true")) {
+        if (myMap.containsKey("idUser") && myMap.containsKey("searchDefaultList") && myMap.get("searchDefaultList").equals("true")) {
             try {
                 if ((conn != null) && (!conn.isClosed())) {
                     return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Userlist.class,
@@ -60,15 +60,19 @@ public class SpringController {
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
-        } /*else {
-            try {
-                if ((conn != null) && (!conn.isClosed())) {
-                    return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Contact.class, "where user2=" + myMap.get("IdUser") + " union (select * from Contact where user1=2)"), Contact.class.getCanonicalName());
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }*/
+
+        }  if (myMap.containsKey("addList") && myMap.get("addList").equals("true") && myMap.containsKey("idUser")) {
+            Userlist list = new Userlist();
+            list.setSql_connection(conn);
+            list.setType(UserListType.CUSTOM.toString());
+            list.setTitle("Prova");
+            list.setDescription("desrcizione della prova");
+            list.setIdUser(myMap.get("idUser"));
+            list.addRecord();
+
+            return "Lista aggiunta con successo";
+
+        }
         return "";
     }
 
@@ -313,6 +317,7 @@ public class SpringController {
                 return "Film eliminato con successo";
             }
         }
+
         return "";
     }
 
