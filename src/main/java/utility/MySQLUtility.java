@@ -231,8 +231,11 @@ public class MySQLUtility {
                 sqlAdd = sqlAdd + sqlAttribute + "VALUES" + sqlValues + " ;";
 
                 Statement st = this.getCnn().createStatement();
+                System.out.println(sqlAdd);
                 st.execute(sqlAdd);
                 st.close();
+            }else{
+                System.out.println("non ci entro proprio");
             }
         } catch (SQLException ex) {
             Logger.getLogger(MySQLUtility.class.getName()).log(Level.SEVERE, null, ex);

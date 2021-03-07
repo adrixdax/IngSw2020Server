@@ -57,6 +57,7 @@ public class FactoryRecord {
             Statement st;
             assert cnn != null;
             st = cnn.createStatement();
+            System.out.println(select);
             ResultSet rs = st.executeQuery(select);
             if (rs.next()) {
                 onj = (AbstractSQLRecord) c.newInstance();

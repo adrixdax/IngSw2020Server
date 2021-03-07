@@ -89,7 +89,8 @@ public class MySQLRecord extends AbstractSQLRecord {
         try {
             this.beforeRecordDeleted();
             Statement st = this.getSql_connection().createStatement();
-            String command = "delete from " + this.getClass().getSimpleName() + " where id_" + this.getClass().getSimpleName() + "='" + this._getPrimaryKeyID() + "'";
+            String command = "delete from " + this.getClass().getSimpleName() + " where id" + this.getClass().getSimpleName() + "='" + this._getPrimaryKeyID() + "'";
+            System.out.println(command);
             st.execute(command);
             st.close();
             this.afterRecordDeleted();
@@ -104,8 +105,8 @@ public class MySQLRecord extends AbstractSQLRecord {
 
         try {
             Class c = this.getClass();
-            Method metodo = c.getMethod("getId_" + c.getSimpleName());
-            rest = (String) metodo.invoke(this);
+            Method metodo = c.getMethod("getId" + c.getSimpleName());
+            rest = String.valueOf(metodo.invoke(this));
         } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException ex) {
             Logger.getLogger(MySQLRecord.class.getName()).log(Level.SEVERE, null, ex);
         }
