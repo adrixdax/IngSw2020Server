@@ -3,6 +3,7 @@ package utility.Json.Creation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import core.Classes.MovieDbExtended;
 import info.movito.themoviedbapi.model.Genre;
 import info.movito.themoviedbapi.model.MovieDb;
 import info.movito.themoviedbapi.model.people.PersonCast;
@@ -60,6 +61,9 @@ class JSONCreationMovieDb {
         } else {
             film.put("cast", "");
         }
+        if (instance instanceof MovieDbExtended){
+            film.put("counter", ((MovieDbExtended) instance).getCounter());
+        }
         try {
             String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(film);
         } catch (JsonProcessingException e) {
@@ -71,10 +75,15 @@ class JSONCreationMovieDb {
     public static String getJSONFilmList(ArrayList<?> instance, ObjectMapper mapper) {
         try {
             ArrayNode filmList = mapper.createArrayNode();
-            for (Object movieDb : instance) filmList.add(getJsonFilmInfo((MovieDb) movieDb, mapper));
-            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(filmList);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            if (instance.get(0).getClass().getSimpleName().equals("MovieDb")) {
+                for (Object movieDb : instance) filmList.add(getJsonFilmInfo((MovieDb) movieDb, mapper));
+                return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(filmList);
+            } else {
+                for (Object movie : instance) filmList.add(getJsonFilmInfo((MovieDbExtended) movie, mapper));
+                return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(filmList);
+            }
+        }catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
         return "{}";
     }

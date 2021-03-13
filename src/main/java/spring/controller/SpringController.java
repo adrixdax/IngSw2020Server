@@ -195,12 +195,13 @@ public class SpringController {
             return JSONCreation.getJSONToCreate(CineMatesTheMovieDB.comingSoon(), MovieDb.class.getSimpleName());
         }
         if (myMap.containsKey("most") && myMap.get("most").equals("true")) {
-            List<AbstractSQLRecord> sql = (FactoryRecord.getNewIstance(conn).getListOfRecord(conn, MostViewed.class, ""));
-            List<MovieDb> movies = new ArrayList<>();
+            List<AbstractSQLRecord> sql = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, MostViewed.class, "");
+            List<MovieDbExtended> movies = new ArrayList<>();
             for (AbstractSQLRecord record : sql) {
-                movies.add(CineMatesTheMovieDB.searchFilmById(((MostViewed) record).getIdFilm()));
+                MovieDbExtended movie = new MovieDbExtended(CineMatesTheMovieDB.searchFilmById(((MostViewed) record).getIdFilm()), ((MostViewed) record).getCounter());
+                movies.add(movie);
             }
-            return JSONCreation.getJSONToCreate(movies, MovieDb.class.getSimpleName());
+            return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
         }
         if (myMap.containsKey("filmId"))
             return JSONCreation.getJSONToCreate(CineMatesTheMovieDB.searchFilmById(Integer.parseInt(myMap.get("filmId"))), MovieDb.class.getSimpleName());

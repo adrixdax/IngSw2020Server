@@ -2,11 +2,10 @@ package utility.Json.Creation;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import core.sql.AbstractSQLRecord;
+import core.Classes.MovieDbExtended;
 import info.movito.themoviedbapi.model.MovieDb;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static utility.Json.Creation.JSONCreationDB.getJsonListDB;
 
@@ -18,7 +17,7 @@ public class JSONCreation {
 
     private static String getJSONList(ArrayList<?> instance, String ClassToConvert) {
         if (instance.size() > 0) {
-            if (ClassToConvert.equals("MovieDb")) {
+            if (ClassToConvert.equals("MovieDb") || ClassToConvert.equals("MovieDbExtended")) {
                 return JSONCreationMovieDb.getJSONFilmList(instance, mapper);
             } else {
                 return getJsonListDB(instance, mapper, ClassToConvert);
@@ -34,6 +33,13 @@ public class JSONCreation {
                 case "MovieDb": {
                     try {
                         return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationMovieDb.getJsonFilmInfo((MovieDb) instance, mapper));
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                case "MovieDbExtended": {
+                    try {
+                        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationMovieDb.getJsonFilmInfo((MovieDbExtended) instance, mapper));
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }

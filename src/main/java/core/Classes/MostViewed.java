@@ -12,11 +12,6 @@ public class MostViewed extends MySQLRecord {
     @MySqlAnnotation(type = MySQLUtility.type_int)
     private int idFilm;
 
-    public MostViewed(@JsonProperty int count,@JsonProperty int idFilm){
-        this.counter=count;
-        this.idFilm=idFilm;
-    }
-
     public int getCounter() {
         return counter;
     }
