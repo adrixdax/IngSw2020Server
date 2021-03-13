@@ -22,11 +22,12 @@ public class MovieDbExtended extends MovieDb {
         id = movie.getId();
         title = movie.getTitle();
         overview = movie.getOverview();
-        genres = getGenres();
-        releaseDate = getReleaseDate();
-        runtime = getRuntime();
-        cast = getCast();
+        genres = movie.getGenres();
+        releaseDate = movie.getReleaseDate();
+        runtime = movie.getRuntime();
+        cast = movie.getCast();
         counter = extCounter;
+        posterPath = movie.getPosterPath();
     }
 
     @Override
