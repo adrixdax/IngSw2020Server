@@ -61,7 +61,8 @@ public class SpringController {
                 ex.printStackTrace();
             }
 
-        }  if (myMap.containsKey("addList") && myMap.get("addList").equals("true") && myMap.containsKey("idUser")) {
+        }
+        if (myMap.containsKey("addList") && myMap.get("addList").equals("true") && myMap.containsKey("idUser")) {
             Userlist list = new Userlist();
             list.setSql_connection(conn);
             list.setType(UserListType.CUSTOM.toString());
@@ -72,6 +73,31 @@ public class SpringController {
 
             return "Lista aggiunta con successo";
 
+        }
+        if (myMap.containsKey("custom") && myMap.get("custom").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idFilm")) {
+
+            List<AbstractSQLRecord> lists = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Userlist.class, "idUser = '" + myMap.get("idUser") + "' " +
+                    " and type='" + UserListType.CUSTOM.toString() + "'");
+
+            if (!myMap.get("idFilm").equals("-1")) {
+                if (lists != null) {
+                    List<Userlist> listToReturn = new ArrayList<>();
+                    for (AbstractSQLRecord single : lists) {
+                        Userlist s = (Userlist) single;
+                        filminlist listToJump = (filminlist) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, filminlist.class, " idList ='" + s.getIdUserList() + "' and idFilm='" + myMap.get("idFilm") + "' ");
+                        if (listToJump == null) {
+                            listToReturn.add(s);
+                        }
+
+                    }
+                    return JSONCreation.getJSONToCreate(listToReturn, Userlist.class.getCanonicalName());
+                }
+
+
+            }else{
+                return JSONCreation.getJSONToCreate(lists, Userlist.class.getCanonicalName());
+
+            }
         }
         return "";
     }
