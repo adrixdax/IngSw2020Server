@@ -239,9 +239,35 @@ public class SpringController {
         if (myMap.containsKey("toSee")) {
             List<AbstractSQLRecord> sql = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, toSee.class, " idUser='"+myMap.get("toSee")+"'");
             List<MovieDb> movies = new ArrayList<>();
-            for (AbstractSQLRecord record : sql)
-                movies.add(CineMatesTheMovieDB.searchFilmById(((toSee) record).getIdFilm()));
-            return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
+            if (sql.size() < 10) {
+                for (AbstractSQLRecord record : sql)
+                    movies.add(CineMatesTheMovieDB.searchFilmById(((toSee) record).getIdFilm()));
+                return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
+            }
+            else{
+                for (int i = 0; i < 10 ; i++)
+                    movies.add(CineMatesTheMovieDB.searchFilmById(((toSee) sql.get(i)).getIdFilm()));
+                return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
+            }
+        }
+        if (myMap.containsKey("userPrefered") && myMap.get("userPrefered").equals("true")) {
+            List<AbstractSQLRecord> sql = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, UserPrefered.class, "");
+            List<MovieDbExtended> movies = new ArrayList<>();
+            System.out.println(sql.size());
+            if (sql.size() < 10) {
+                for (AbstractSQLRecord record : sql) {
+                    MovieDbExtended movie = new MovieDbExtended(CineMatesTheMovieDB.searchFilmById(((UserPrefered) record).getIdFilm()), ((UserPrefered) record).getCounter());
+                    movies.add(movie);
+                }
+                return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
+            }
+            else{
+                for (int i = 0; i < 10 ; i++) {
+                    MovieDbExtended movie = new MovieDbExtended(CineMatesTheMovieDB.searchFilmById(((UserPrefered) sql.get(i)).getIdFilm()), ((UserPrefered) sql.get(i)).getCounter());
+                    movies.add(movie);
+                }
+                return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
+            }
         }
         if (myMap.containsKey("filmId"))
             return JSONCreation.getJSONToCreate(CineMatesTheMovieDB.searchFilmById(Integer.parseInt(myMap.get("filmId"))), MovieDb.class.getSimpleName());
