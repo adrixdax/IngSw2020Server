@@ -47,6 +47,13 @@ public class SpringController {
             e.printStackTrace();
         }
         assert request != null;
+        try {
+            if (conn.isClosed()){
+                conn = new DbConnectionForBackEnd().getConnection();
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
         Map<String, String> myMap = request.getMap();
         if (myMap.containsKey("idUser") && myMap.containsKey("searchDefaultList") && myMap.get("searchDefaultList").equals("true")) {
             try {
@@ -227,6 +234,13 @@ public class SpringController {
                 MovieDbExtended movie = new MovieDbExtended(CineMatesTheMovieDB.searchFilmById(((MostViewed) record).getIdFilm()), ((MostViewed) record).getCounter());
                 movies.add(movie);
             }
+            return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
+        }
+        if (myMap.containsKey("toSee")) {
+            List<AbstractSQLRecord> sql = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, toSee.class, " idUser='"+myMap.get("toSee")+"'");
+            List<MovieDb> movies = new ArrayList<>();
+            for (AbstractSQLRecord record : sql)
+                movies.add(CineMatesTheMovieDB.searchFilmById(((toSee) record).getIdFilm()));
             return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
         }
         if (myMap.containsKey("filmId"))
