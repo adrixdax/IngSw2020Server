@@ -48,7 +48,7 @@ public class SpringController {
         }
         assert request != null;
         try {
-            if (conn.isClosed()){
+            if (conn.isClosed()) {
                 conn = new DbConnectionForBackEnd().getConnection();
             }
         } catch (SQLException throwables) {
@@ -69,12 +69,12 @@ public class SpringController {
             }
 
         }
-        if (myMap.containsKey("addList") && myMap.get("addList").equals("true") && myMap.containsKey("idUser")) {
+        if (myMap.containsKey("addList") && myMap.get("addList").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("listTitle")) {
             Userlist list = new Userlist();
             list.setSql_connection(conn);
             list.setType(UserListType.CUSTOM.toString());
-            list.setTitle("Prova");
-            list.setDescription("desrcizione della prova");
+            list.setTitle(myMap.get("listTitle"));
+            list.setDescription(myMap.get("listDescription"));
             list.setIdUser(myMap.get("idUser"));
             list.addRecord();
 
@@ -101,7 +101,7 @@ public class SpringController {
                 }
 
 
-            }else{
+            } else {
                 return JSONCreation.getJSONToCreate(lists, Userlist.class.getCanonicalName());
 
             }
@@ -236,20 +236,6 @@ public class SpringController {
             }
             return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
         }
-        if (myMap.containsKey("toSee")) {
-            List<AbstractSQLRecord> sql = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, toSee.class, " idUser='"+myMap.get("toSee")+"'");
-            List<MovieDb> movies = new ArrayList<>();
-            if (sql.size() < 10) {
-                for (AbstractSQLRecord record : sql)
-                    movies.add(CineMatesTheMovieDB.searchFilmById(((toSee) record).getIdFilm()));
-                return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
-            }
-            else{
-                for (int i = 0; i < 10 ; i++)
-                    movies.add(CineMatesTheMovieDB.searchFilmById(((toSee) sql.get(i)).getIdFilm()));
-                return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
-            }
-        }
         if (myMap.containsKey("userPrefered") && myMap.get("userPrefered").equals("true")) {
             List<AbstractSQLRecord> sql = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, UserPrefered.class, "");
             List<MovieDbExtended> movies = new ArrayList<>();
@@ -260,9 +246,8 @@ public class SpringController {
                     movies.add(movie);
                 }
                 return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
-            }
-            else{
-                for (int i = 0; i < 10 ; i++) {
+            } else {
+                for (int i = 0; i < 10; i++) {
                     MovieDbExtended movie = new MovieDbExtended(CineMatesTheMovieDB.searchFilmById(((UserPrefered) sql.get(i)).getIdFilm()), ((UserPrefered) sql.get(i)).getCounter());
                     movies.add(movie);
                 }
@@ -383,6 +368,15 @@ public class SpringController {
                 film.deleteRecord();
                 return "Film eliminato con successo";
             }
+        } else if (myMap.containsKey("idList")) {
+
+            List<AbstractSQLRecord> sql = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, filminlist.class, "idList='" + myMap.get("idList") + "'");
+            List<MovieDb> movies = new ArrayList<>();
+
+            for (AbstractSQLRecord record : sql)
+                movies.add(CineMatesTheMovieDB.searchFilmById(((filminlist) record).getIdFilm()));
+            return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
+
         }
 
         return "";
