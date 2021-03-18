@@ -275,14 +275,22 @@ public class SpringController {
     //ip:8080/film?name=name&year=0000
     //ip:8080/film?name=name&year=0000&adult=false
 
-
-    @GetMapping(value = "/review")
+    @PostMapping(value = "/review")
     @ResponseBody
-    public String review(@RequestParam Map<String, String> query) {
-        if (query.containsKey("idFilm")) {
-            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "idFilm=" + query.get("idFilm")), reviews.class.getCanonicalName());
+    public String review(@RequestBody String query) {
+        HTTPRequest request = null;
+        try {
+            System.out.println("Provaaaaaaaaa: " + query);
+            request = (HTTPRequest) JSONDecoder.getDecodedJson(query);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        assert request != null;
+        Map<String, String> myMap = request.getMap();
+        if (myMap.containsKey("idFilm")) {
+            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "idFilm=" + myMap.get("idFilm")), reviews.class.getCanonicalName());
         } else {
-            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "iduser=" + query.get("iduser")), reviews.class.getCanonicalName());
+            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "iduser=" + myMap.get("iduser")), reviews.class.getCanonicalName());
         }
     }
 
