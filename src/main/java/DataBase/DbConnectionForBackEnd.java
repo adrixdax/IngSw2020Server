@@ -18,13 +18,7 @@ public class DbConnectionForBackEnd {
     private final String version = "";
 
     public DbConnectionForBackEnd() {
-
-    }
-
-    public DbConnectionForBackEnd(String user) {
-        this.user = user;
-        recoverPW();
-        recoverSchema();
+        createConnection();
     }
 
     private void recoverUser() {
@@ -61,17 +55,16 @@ public class DbConnectionForBackEnd {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection(linkToDb, user, pw);
-            System.out.println("Status: " + (!con.isClosed()));
             String command = "use "+schema;
             PreparedStatement st = con.prepareStatement(command);
             return st.execute(command);
         } catch (Exception ex) {
-            //ex.printStackTrace();
             return false;
         }
     }
 
     public Connection getConnection() {
+        createConnection();
         return con;
     }
 
