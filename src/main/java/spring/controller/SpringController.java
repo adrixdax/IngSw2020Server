@@ -305,7 +305,7 @@ public class SpringController {
                 reviews rew = new reviews();
                 rew.setSql_connection(conn);
                 rew.setTitle(myMap.get("title"));
-                rew.setDesc(myMap.get("description"));
+                rew.setDescription(myMap.get("description"));
                 rew.setIdFilm(Integer.parseInt(myMap.get("idFilm")));
                 rew.setIduser(myMap.get("idUser"));
                 rew.setVal(Double.parseDouble(myMap.get("val")));
