@@ -10,7 +10,7 @@ public class reviews extends MySQLRecord {
     @MySqlAnnotation(type = MySQLUtility.type_string)
     private String title;
     @MySqlAnnotation(type = MySQLUtility.type_string)
-    private String desc;
+    private String description;
     @MySqlAnnotation(type = MySQLUtility.type_double)
     private double val;
     @MySqlAnnotation(type = MySQLUtility.type_int)
@@ -35,11 +35,11 @@ public class reviews extends MySQLRecord {
     }
 
     public String getDesc() {
-        return desc;
+        return description;
     }
 
     public void setDesc(String desc) {
-        this.desc = desc;
+        this.description = desc;
     }
 
     public double getVal() {

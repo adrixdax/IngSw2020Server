@@ -299,13 +299,13 @@ public class SpringController {
         }
         assert request != null;
         Map<String, String> myMap = request.getMap();
-        if (myMap.containsKey("idFilm") && myMap.containsKey("title") && myMap.containsKey("desc") && myMap.containsKey("val") && myMap.containsKey("idUser") && myMap.containsKey("insert") && myMap.get("insert").equals("true")) {
+        if (myMap.containsKey("idFilm") && myMap.containsKey("title") && myMap.containsKey("description") && myMap.containsKey("val") && myMap.containsKey("idUser") && myMap.containsKey("insert") && myMap.get("insert").equals("true")) {
             try {
                 checkConnection();
                 reviews rew = new reviews();
                 rew.setSql_connection(conn);
                 rew.setTitle(myMap.get("title"));
-                rew.setDesc(myMap.get("desc"));
+                rew.setDesc(myMap.get("description"));
                 rew.setIdFilm(Integer.parseInt(myMap.get("idFilm")));
                 rew.setIduser(myMap.get("idUser"));
                 rew.setVal(Double.parseDouble(myMap.get("val")));
@@ -314,8 +314,6 @@ public class SpringController {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-
         }
         try {
             checkConnection();
