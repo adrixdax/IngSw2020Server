@@ -294,11 +294,29 @@ public class SpringController {
         }
         assert request != null;
         Map<String, String> myMap = request.getMap();
-        if (myMap.containsKey("idFilm")) {
+        if (myMap.containsKey("idFilm") && myMap.containsKey("title") && myMap.containsKey("desc") && myMap.containsKey("val") && myMap.containsKey("idUser") && myMap.containsKey("insert") && myMap.get("insert").equals("true")) {
+            try {
+                reviews rew = new reviews();
+                rew.setSql_connection(conn);
+                rew.setTitle(myMap.get("title"));
+                rew.setDesc(myMap.get("desc"));
+                rew.setIdFilm(Integer.valueOf(myMap.get("idFilm")));
+                rew.setIduser(myMap.get("idUser"));
+                rew.setVal(Double.valueOf(myMap.get("val")));
+                rew.addRecord();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+        }
+        if (myMap.containsKey("idFilm") && myMap.containsKey("insert") && myMap.get("insert").equals("false")) {
             return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "idFilm=" + myMap.get("idFilm")), reviews.class.getCanonicalName());
-        } else {
+        } else if (myMap.containsKey("idUser") && myMap.containsKey("insert") && myMap.get("insert").equals("false")) {
             return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "iduser=" + myMap.get("iduser")), reviews.class.getCanonicalName());
         }
+        return "";
     }
 
     //ip:8080/review?filmId=id
@@ -315,7 +333,7 @@ public class SpringController {
     @ResponseBody
     public String notify(@RequestParam Map<String, String> query) {
         List<Notify> list = new ArrayList<>();
-        List<AbstractSQLRecord> rec = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Notify.class, "id_receiver=" + query.get("idUser"));
+        List<AbstractSQLRecord> rec = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Notify.class, "id_receiver='" + query.get("idUser") + "'");
         if (rec.size() > 0) {
             for (AbstractSQLRecord record : rec) {
                 list.add((Notify) record);
