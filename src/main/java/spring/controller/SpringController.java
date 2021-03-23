@@ -8,6 +8,7 @@ import core.Classes.*;
 import core.sql.AbstractSQLRecord;
 import core.sql.FactoryRecord;
 import info.movito.themoviedbapi.model.MovieDb;
+import org.mockito.internal.matchers.Not;
 import org.springframework.web.bind.annotation.*;
 import utility.Json.Creation.JSONCreation;
 import utility.Json.Decode.JSONDecoder;
@@ -368,14 +369,38 @@ public class SpringController {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        List<AbstractSQLRecord> rec = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Notify.class, "id_receiver='" + query.get("idUser") + "'");
-        if (rec.size() > 0) {
-            for (AbstractSQLRecord record : rec) {
-                list.add((Notify) record);
-            }
-            return JSONCreation.getJSONToCreate(list, Notify.class.getCanonicalName());
-        } else
-            return "[]";
+        if (query.containsKey("idUser")) {
+            List<AbstractSQLRecord> rec = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Notify.class, "id_receiver='" + query.get("idUser") + "' and (state = 'PENDING' OR state = 'SEEN') order by state asc");
+            if (rec.size() > 0) {
+                for (AbstractSQLRecord record : rec) {
+                    list.add((Notify) record);
+                }
+                return JSONCreation.getJSONToCreate(list, Notify.class.getCanonicalName());
+            } else
+                return "[]";
+        }
+        else if (query.containsKey("Seen")){
+            Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn,Notify.class,"id_Notify="+query.get("Seen"));
+            not.setSql_connection(conn);
+            not.setState("SEEN");
+            not.updateRecord();
+            return "Status Changed";
+        }
+        else if (query.containsKey("Accepted")){
+            Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn,Notify.class,"id_Notify="+query.get("Accepted"));
+            not.setSql_connection(conn);
+                not.setState("ACCEPTED");
+            not.updateRecord();
+            return "Status Changed";
+        }
+        else if (query.containsKey("Refused")){
+            Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn,Notify.class,"id_Notify="+query.get("Refused"));
+            not.setSql_connection(conn);
+            not.setState("REFUSED");
+            not.updateRecord();
+            return "Status Changed";
+        }
+        return "[]";
     }
 
     //ip:8080/list?userId=id

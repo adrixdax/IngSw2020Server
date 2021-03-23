@@ -2,12 +2,13 @@ package core.Classes;
 
 import core.sql.MySQLRecord;
 import core.sql.MySqlAnnotation;
+import org.checkerframework.checker.i18nformatter.qual.I18nChecksFormat;
 import utility.MySQLUtility;
 
 public class Notify extends MySQLRecord {
 
     @MySqlAnnotation(type = MySQLUtility.type_int)
-    int id_notify;
+    int id_Notify;
     @MySqlAnnotation(type = MySQLUtility.type_string)
     String id_sender;
     @MySqlAnnotation(type = MySQLUtility.type_string)
@@ -20,12 +21,12 @@ public class Notify extends MySQLRecord {
     String state;
 
 
-    public int getId_notify() {
-        return id_notify;
+    public int getId_Notify() {
+        return id_Notify;
     }
 
-    public void setId_notify(int id_notify) {
-        this.id_notify = id_notify;
+    public void setId_Notify(int id_Notify) {
+        this.id_Notify = id_Notify;
     }
 
     public String getId_sender() {
@@ -67,4 +68,5 @@ public class Notify extends MySQLRecord {
     public void setState(String state) {
         this.state = state;
     }
+
 }
