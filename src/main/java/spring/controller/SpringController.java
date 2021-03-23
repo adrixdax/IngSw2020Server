@@ -235,7 +235,7 @@ public class SpringController {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        if (myMap.containsKey("most") && myMap.get("most").equals("true")) {
+        if (myMap.containsKey("mostviewed") && myMap.get("mostviewed").equals("true")) {
             List<AbstractSQLRecord> sql = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, MostViewed.class, "");
             List<MovieDbExtended> movies = new ArrayList<>();
             if (sql.size() < 10) {
@@ -246,6 +246,22 @@ public class SpringController {
             } else {
                 for (int i = 0; i < 10; i++) {
                     MovieDbExtended movie = new MovieDbExtended(CineMatesTheMovieDB.searchFilmById(((MostViewed) sql.get(i)).getIdFilm()), ((MostViewed) sql.get(i)).getCounter());
+                    movies.add(movie);
+                }
+            }
+            return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
+        }
+        if (myMap.containsKey("mostreviewed") && myMap.get("mostreviewed").equals("true")) {
+            List<AbstractSQLRecord> sql = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, MostReviewed.class, "");
+            List<MovieDbExtended> movies = new ArrayList<>();
+            if (sql.size() < 10) {
+                for (AbstractSQLRecord record : sql) {
+                    MovieDbExtended movie = new MovieDbExtended(CineMatesTheMovieDB.searchFilmById(((MostReviewed) record).getIdFilm()), ((MostReviewed) record).getCounter());
+                    movies.add(movie);
+                }
+            } else {
+                for (int i = 0; i < 10; i++) {
+                    MovieDbExtended movie = new MovieDbExtended(CineMatesTheMovieDB.searchFilmById(((MostReviewed) sql.get(i)).getIdFilm()), ((MostReviewed) sql.get(i)).getCounter());
                     movies.add(movie);
                 }
             }
