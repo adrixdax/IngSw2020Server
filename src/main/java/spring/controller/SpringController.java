@@ -8,11 +8,11 @@ import core.Classes.*;
 import core.sql.AbstractSQLRecord;
 import core.sql.FactoryRecord;
 import info.movito.themoviedbapi.model.MovieDb;
-import org.mockito.internal.matchers.Not;
 import org.springframework.web.bind.annotation.*;
 import utility.Json.Creation.JSONCreation;
 import utility.Json.Decode.JSONDecoder;
 import utility.Json.Requests.HTTPRequest;
+import utility.NotifyStatusType;
 import utility.UserListType;
 
 import java.sql.Connection;
@@ -399,6 +399,19 @@ public class SpringController {
             not.setState("REFUSED");
             not.updateRecord();
             return "Status Changed";
+        }
+        else if(query.containsKey("id_sender") && query.containsKey("id_receiver") && query.containsKey("type") && query.containsKey("sendNotify") && query.get("sendNotify").equals("true")){
+
+            Notify not = new Notify();
+            not.setSql_connection(conn);
+            not.setId_receiver(query.get("id_receiver"));
+            not.setId_sender(query.get("id_sender"));
+            not.setType(query.get("type"));
+            not.setId_recordref(Integer.parseInt(query.get("id_recordref").isEmpty()?"0" :query.get("id_recordref")));
+            not.setState(NotifyStatusType.PENDING.toString());
+            not.addRecord();
+
+            return "Notifica inviata con successo";
         }
         return "[]";
     }
