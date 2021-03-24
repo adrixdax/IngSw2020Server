@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class DbConnectionForBackEnd {
     private static Connection con;
     private static final File config = new File("src/main/java/DataBase/config");
-    private final String linkToDb = "jdbc:mysql://87.16.144.72:3306";
+    private final String linkToDb = "jdbc:mysql://87.1.139.228:3306";
     private String user = "Adriano";
     private String pw = "IngSw2020!";
     private String schema = "Cinemates20Development";
