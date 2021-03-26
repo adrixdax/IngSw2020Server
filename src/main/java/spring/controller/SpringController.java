@@ -8,6 +8,7 @@ import core.Classes.*;
 import core.sql.AbstractSQLRecord;
 import core.sql.FactoryRecord;
 import info.movito.themoviedbapi.model.MovieDb;
+import org.mockito.internal.matchers.Not;
 import org.springframework.web.bind.annotation.*;
 import utility.Json.Creation.JSONCreation;
 import utility.Json.Decode.JSONDecoder;
@@ -17,9 +18,7 @@ import utility.UserListType;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static MovieDB.CineMatesTheMovieDB.searchFilmByName;
 
@@ -235,6 +234,17 @@ public class SpringController {
             checkConnection();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+        }
+        if (myMap.containsKey("suggested") && myMap.get("suggested").equals("true")) {
+            List<AbstractSQLRecord> list = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Notify.class,"where id_receiver='"+myMap.get("idUser")+"' and state='ACCEPTED' and type='Film'");
+            List<MovieDb> filmList = new ArrayList<>();
+            for (AbstractSQLRecord rec : list){
+                filmList.add(CineMatesTheMovieDB.searchFilmById(((Notify)(rec)).getId_recordref()));
+        }
+            Set<MovieDb> set = new HashSet<>(filmList);
+            filmList.clear();
+            filmList.addAll(set);
+            return JSONCreation.getJSONToCreate(filmList,MovieDb.class.getSimpleName());
         }
         if (myMap.containsKey("mostviewed") && myMap.get("mostviewed").equals("true")) {
             List<AbstractSQLRecord> sql = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, MostViewed.class, "");

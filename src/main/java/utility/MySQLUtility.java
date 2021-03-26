@@ -237,9 +237,7 @@ public class MySQLUtility {
             }else{
                 System.out.println("non ci entro proprio");
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(MySQLUtility.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
+        } catch (SQLException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
             Logger.getLogger(MySQLUtility.class.getName()).log(Level.SEVERE, null, ex);
         }
 
