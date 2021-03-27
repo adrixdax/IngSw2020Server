@@ -125,6 +125,17 @@ public class SpringController {
             }
 
         }
+        else if(myMap.containsKey("isFriends") && myMap.get("isFriends").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idOtherUser")){
+
+            Contact contact = (Contact) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Contact.class, "where (user1 ='"+myMap.get("idUser")+"' And user2 ='"+myMap.get("idOtherUser")+"') " +
+                    "OR (user1 = '"+myMap.get("idOtherUser")+"' AND user2 ='"+myMap.get("idUser") +"' )");
+
+            if(contact != null) {
+                return "true";
+            }else{
+                return "false";
+            }
+        }
         return "";
     }
 
