@@ -229,9 +229,7 @@ public class MySQLUtility {
                 sqlAttribute = sqlAttribute.substring(0, sqlAttribute.length() - 1) + ")";
                 sqlValues = sqlValues.substring(0, sqlValues.length() - 1) + ")";
                 sqlAdd = sqlAdd + sqlAttribute + "VALUES" + sqlValues + " ;";
-
                 Statement st = this.getCnn().createStatement();
-                System.out.println(sqlAdd);
                 st.execute(sqlAdd);
                 st.close();
             }else{
