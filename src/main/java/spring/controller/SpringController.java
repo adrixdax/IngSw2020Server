@@ -371,7 +371,7 @@ public class SpringController {
         if (myMap.containsKey("idFilm") && myMap.containsKey("insert") && myMap.get("insert").equals("false")) {
             return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "idFilm=" + myMap.get("idFilm")), reviews.class.getCanonicalName());
         } else if (myMap.containsKey("idUser") && myMap.containsKey("insert") && myMap.get("insert").equals("false")) {
-            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "iduser='" + myMap.get("iduser") + "'"), reviews.class.getCanonicalName());
+            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "iduser='" + myMap.get("idUser") + "'"), reviews.class.getCanonicalName());
         }
         return "";
     }
