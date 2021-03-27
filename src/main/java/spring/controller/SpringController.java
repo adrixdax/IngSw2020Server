@@ -8,7 +8,6 @@ import core.Classes.*;
 import core.sql.AbstractSQLRecord;
 import core.sql.FactoryRecord;
 import info.movito.themoviedbapi.model.MovieDb;
-import org.mockito.internal.matchers.Not;
 import org.springframework.web.bind.annotation.*;
 import utility.Json.Creation.JSONCreation;
 import utility.Json.Decode.JSONDecoder;
@@ -62,11 +61,11 @@ public class SpringController {
         if (myMap.containsKey("idUser") && myMap.containsKey("searchDefaultList") && myMap.get("searchDefaultList").equals("true")) {
             try {
                 if (checkConnection()) {
-                    return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Userlist.class,
+                    return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, UserList.class,
                             "idUser = '" + myMap.get("idUser") + "' " +
                                     " and (type='" + UserListType.PREFERED.toString() + "' " +
                                     " OR type='" + UserListType.WATCH.toString() +
-                                    "' OR type='" + UserListType.TOWATCH.toString() + "' )"), Userlist.class.getCanonicalName());
+                                    "' OR type='" + UserListType.TOWATCH.toString() + "' )"), UserList.class.getCanonicalName());
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -74,7 +73,7 @@ public class SpringController {
 
         }
         if (myMap.containsKey("addList") && myMap.get("addList").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("listTitle")) {
-            Userlist list = new Userlist();
+            UserList list = new UserList();
             list.setSql_connection(conn);
             list.setType(UserListType.CUSTOM.toString());
             list.setTitle(myMap.get("listTitle"));
@@ -87,52 +86,59 @@ public class SpringController {
         }
         if (myMap.containsKey("custom") && myMap.get("custom").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idFilm")) {
 
-            List<AbstractSQLRecord> lists = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Userlist.class, "idUser = '" + myMap.get("idUser") + "' " +
+            List<AbstractSQLRecord> lists = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, UserList.class, "idUser = '" + myMap.get("idUser") + "' " +
                     " and type='" + UserListType.CUSTOM.toString() + "'");
 
             if (!myMap.get("idFilm").equals("-1")) {
                 if (lists != null) {
-                    List<Userlist> listToReturn = new ArrayList<>();
+                    List<UserList> listToReturn = new ArrayList<>();
                     for (AbstractSQLRecord single : lists) {
-                        Userlist s = (Userlist) single;
+                        UserList s = (UserList) single;
                         filminlist listToJump = (filminlist) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, filminlist.class, " idList ='" + s.getIdUserList() + "' and idFilm='" + myMap.get("idFilm") + "' ");
                         if (listToJump == null) {
                             listToReturn.add(s);
                         }
 
                     }
-                    return JSONCreation.getJSONToCreate(listToReturn, Userlist.class.getCanonicalName());
+                    return JSONCreation.getJSONToCreate(listToReturn, UserList.class.getCanonicalName());
                 }
 
 
             } else {
-                return JSONCreation.getJSONToCreate(lists, Userlist.class.getCanonicalName());
+                return JSONCreation.getJSONToCreate(lists, UserList.class.getCanonicalName());
 
             }
-        }else if(myMap.containsKey("addFriends") && myMap.get("addFriends").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idOtherUser")){
+        }else if (myMap.containsKey("removeList") && myMap.get("removeList").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idList")) {
 
-            Contact contact = (Contact) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Contact.class, "where (user1 ='"+myMap.get("idUser")+"' And user2 ='"+myMap.get("idOtherUser")+"') " +
-                    "OR (user1 = '"+myMap.get("idOtherUser")+"' AND user2 ='"+myMap.get("idUser") +"' )");
+            UserList list = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "where idUser='" + myMap.get("idUser") +"' and idUserList='" +myMap.get("idList")+"'");
+            if(list!=null){
+                list.deleteRecord();
+            }
 
-            if(contact == null) {
+
+        } else if (myMap.containsKey("addFriends") && myMap.get("addFriends").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idOtherUser")) {
+
+            Contact contact = (Contact) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Contact.class, "where (user1 ='" + myMap.get("idUser") + "' And user2 ='" + myMap.get("idOtherUser") + "') " +
+                    "OR (user1 = '" + myMap.get("idOtherUser") + "' AND user2 ='" + myMap.get("idUser") + "' )");
+
+            if (contact == null) {
                 contact = new Contact();
                 contact.setUser1(myMap.get("idUser"));
                 contact.setUser2(myMap.get("idOtherUser"));
                 contact.setSql_connection(conn);
                 contact.addRecord();
-            }else{
+            } else {
                 return "Utenti già Amici";
             }
 
-        }
-        else if(myMap.containsKey("isFriends") && myMap.get("isFriends").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idOtherUser")){
+        } else if (myMap.containsKey("isFriends") && myMap.get("isFriends").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idOtherUser")) {
 
-            Contact contact = (Contact) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Contact.class, "where (user1 ='"+myMap.get("idUser")+"' And user2 ='"+myMap.get("idOtherUser")+"') " +
-                    "OR (user1 = '"+myMap.get("idOtherUser")+"' AND user2 ='"+myMap.get("idUser") +"' )");
+            Contact contact = (Contact) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Contact.class, "where (user1 ='" + myMap.get("idUser") + "' And user2 ='" + myMap.get("idOtherUser") + "') " +
+                    "OR (user1 = '" + myMap.get("idOtherUser") + "' AND user2 ='" + myMap.get("idUser") + "' )");
 
-            if(contact != null) {
+            if (contact != null) {
                 return "true";
-            }else{
+            } else {
                 return "false";
             }
         }
@@ -156,7 +162,7 @@ public class SpringController {
         if (myMap.containsKey("registration")) {
             try {
                 if (checkConnection()) {
-                    Userlist list = new Userlist();
+                    UserList list = new UserList();
                     list.setIdUser(myMap.get("registration"));
                     list.setSql_connection(conn);
                     list.setDescription("Preferiti");
@@ -164,7 +170,7 @@ public class SpringController {
                     list.setType(UserListType.PREFERED.toString());
                     list.addRecord();
 
-                    list = new Userlist();
+                    list = new UserList();
                     list.setIdUser(myMap.get("registration"));
                     list.setSql_connection(conn);
                     list.setDescription("Da Vedere");
@@ -172,7 +178,7 @@ public class SpringController {
                     list.setType(UserListType.TOWATCH.toString());
                     list.addRecord();
 
-                    list = new Userlist();
+                    list = new UserList();
                     list.setIdUser(myMap.get("registration"));
                     list.setSql_connection(conn);
                     list.setDescription("Visti");
@@ -190,11 +196,11 @@ public class SpringController {
             try {
                 if (checkConnection()) {
 
-                    Userlist list = (Userlist) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Userlist.class, "where idUser='" + myMap.get("google") + "' and type='PREFERED'");
+                    UserList list = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "where idUser='" + myMap.get("google") + "' and type='PREFERED'");
 
 
                     if (list == null) {
-                        list = new Userlist();
+                        list = new UserList();
                         list.setIdUser(myMap.get("google"));
                         list.setSql_connection(conn);
                         list.setDescription("Preferiti");
@@ -203,10 +209,10 @@ public class SpringController {
                         list.addRecord();
                     }
 
-                    list = (Userlist) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Userlist.class, "where idUser='" + myMap.get("google") + "' and type='TOWATCH'");
+                    list = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "where idUser='" + myMap.get("google") + "' and type='TOWATCH'");
 
                     if (list == null) {
-                        list = new Userlist();
+                        list = new UserList();
                         list.setIdUser(myMap.get("google"));
                         list.setSql_connection(conn);
                         list.setDescription("Da Vedere");
@@ -215,10 +221,10 @@ public class SpringController {
                         list.addRecord();
                     }
 
-                    list = (Userlist) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Userlist.class, "where idUser='" + myMap.get("google") + "' and type='WATCH'");
+                    list = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "where idUser='" + myMap.get("google") + "' and type='WATCH'");
 
                     if (list == null) {
-                        list = new Userlist();
+                        list = new UserList();
                         list.setIdUser(myMap.get("google"));
                         list.setSql_connection(conn);
                         list.setDescription("Visti");
@@ -382,7 +388,7 @@ public class SpringController {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Userlist.class, "idUser=" + query.get("idUser")), Userlist.class.getCanonicalName());
+        return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, UserList.class, "idUser=" + query.get("idUser")), UserList.class.getCanonicalName());
     }
 
     @GetMapping(value = "/notify")
@@ -403,36 +409,32 @@ public class SpringController {
                 return JSONCreation.getJSONToCreate(list, Notify.class.getCanonicalName());
             } else
                 return "[]";
-        }
-        else if (query.containsKey("Seen")){
-            Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn,Notify.class,"id_Notify="+query.get("Seen"));
+        } else if (query.containsKey("Seen")) {
+            Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Notify.class, "id_Notify=" + query.get("Seen"));
             not.setSql_connection(conn);
             not.setState("SEEN");
             not.updateRecord();
             return "Status Changed";
-        }
-        else if (query.containsKey("Accepted")){
-            Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn,Notify.class,"id_Notify="+query.get("Accepted"));
+        } else if (query.containsKey("Accepted")) {
+            Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Notify.class, "id_Notify=" + query.get("Accepted"));
             not.setSql_connection(conn);
-                not.setState("ACCEPTED");
+            not.setState("ACCEPTED");
             not.updateRecord();
             return "Status Changed";
-        }
-        else if (query.containsKey("Refused")){
-            Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn,Notify.class,"id_Notify="+query.get("Refused"));
+        } else if (query.containsKey("Refused")) {
+            Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Notify.class, "id_Notify=" + query.get("Refused"));
             not.setSql_connection(conn);
             not.setState("REFUSED");
             not.updateRecord();
             return "Status Changed";
-        }
-        else if(query.containsKey("id_sender") && query.containsKey("id_receiver") && query.containsKey("type") && query.containsKey("sendNotify") && query.get("sendNotify").equals("true")){
+        } else if (query.containsKey("id_sender") && query.containsKey("id_receiver") && query.containsKey("type") && query.containsKey("sendNotify") && query.get("sendNotify").equals("true")) {
 
             Notify not = new Notify();
             not.setSql_connection(conn);
             not.setId_receiver(query.get("id_receiver"));
             not.setId_sender(query.get("id_sender"));
             not.setType(query.get("type"));
-            not.setId_recordref(Integer.parseInt(query.get("id_recordref").isEmpty()?"0" :query.get("id_recordref")));
+            not.setId_recordref(Integer.parseInt(query.get("id_recordref").isEmpty() ? "0" : query.get("id_recordref")));
             not.setState(NotifyStatusType.PENDING.toString());
             not.addRecord();
 

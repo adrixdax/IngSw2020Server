@@ -4,7 +4,7 @@ import core.sql.MySQLRecord;
 import core.sql.MySqlAnnotation;
 import utility.MySQLUtility;
 
-public class Userlist extends MySQLRecord {
+public class UserList extends MySQLRecord {
     @MySqlAnnotation(type = MySQLUtility.type_int)
     private int idUserList;
     @MySqlAnnotation(type = MySQLUtility.type_string)
