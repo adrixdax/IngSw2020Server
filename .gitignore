@@ -4,3 +4,5 @@
 IngSw2020Server.iml
 /src/main/java/.goutputstream-TA1WW0
 /src/main/resources/META-INF/
+artifacts/IngSw2020Server_jar/IngSw2020Server-1.0-SNAPSHOT.jar
+src/main/java/META-INF/MANIFEST.MF
