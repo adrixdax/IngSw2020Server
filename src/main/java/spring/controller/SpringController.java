@@ -109,6 +109,21 @@ public class SpringController {
                 return JSONCreation.getJSONToCreate(lists, Userlist.class.getCanonicalName());
 
             }
+        }else if(myMap.containsKey("addFriends") && myMap.get("addFriends").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idOtherUser")){
+
+            Contact contact = (Contact) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Contact.class, "where (user1 ='"+myMap.get("idUser")+"' And user2 ='"+myMap.get("idOtherUser")+"') " +
+                    "OR (user1 = '"+myMap.get("idOtherUser")+"' AND user2 ='"+myMap.get("idUser") +"' )");
+
+            if(contact == null) {
+                contact = new Contact();
+                contact.setUser1(myMap.get("idUser"));
+                contact.setUser2(myMap.get("idOtherUser"));
+                contact.setSql_connection(conn);
+                contact.addRecord();
+            }else{
+                return "Utenti già Amici";
+            }
+
         }
         return "";
     }
