@@ -141,6 +141,8 @@ public class SpringController {
             } else {
                 return "false";
             }
+        } else if(myMap.containsKey("isFriends") && myMap.get("isFriends").equals("true") && myMap.containsKey("idUser")){
+            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Contact.class, "(user1  ='"+myMap.get("idUser")+"') OR (user2 = '"+myMap.get("idUser")+"')"), Contact.class.getCanonicalName());
         }
         return "";
     }
