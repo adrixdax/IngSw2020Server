@@ -78,7 +78,14 @@
             <artifactId>themoviedbapi</artifactId>
             <version>1.10</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>fluent-hc</artifactId>
+            <version>4.5.13</version>
+        </dependency>
+
     </dependencies>
+
 
     <groupId>groupId</groupId>
     <artifactId>IngSw2020Server</artifactId>

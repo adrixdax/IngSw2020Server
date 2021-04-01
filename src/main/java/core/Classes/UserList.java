@@ -1,5 +1,6 @@
 package core.Classes;
 
+import core.sql.FactoryRecord;
 import core.sql.MySQLRecord;
 import core.sql.MySqlAnnotation;
 import utility.MySQLUtility;
@@ -15,6 +16,8 @@ public class UserList extends MySQLRecord {
     private String type;
     @MySqlAnnotation(type = MySQLUtility.type_string)
     private String idUser;
+    @MySqlAnnotation(type=MySQLUtility.type_int)
+    private int dependency_List;
 
     public int getIdUserList() {
         return idUserList;
@@ -52,8 +55,20 @@ public class UserList extends MySQLRecord {
         return idUser;
     }
 
-    public void setIdUser(String idUser) {
-        this.idUser = idUser;
+    public void setIdUser(String idUser){this.idUser=idUser;};
+
+    public int getDependency_List() {
+        return dependency_List;
     }
+
+    public void setDependency_List(int dependency_List) {
+        this.dependency_List = dependency_List;
+    }
+
+    @Override
+    public void afterRecordInsert(){
+        this.idUserList = ((UserList)FactoryRecord.getNewIstance(getSql_connection()).getSingleRecord(getSql_connection(),this.getClass(),"where idUser='"+this.idUser+"' and dependency_List='"+this.dependency_List+"'")).getIdUserList();
+    }
+
 }
 

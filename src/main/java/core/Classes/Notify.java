@@ -1,9 +1,12 @@
 package core.Classes;
 
+import core.sql.FactoryRecord;
 import core.sql.MySQLRecord;
 import core.sql.MySqlAnnotation;
 import org.checkerframework.checker.i18nformatter.qual.I18nChecksFormat;
 import utility.MySQLUtility;
+import utility.NotifyStatusType;
+import utility.NotifyTypes;
 
 public class Notify extends MySQLRecord {
 
@@ -17,7 +20,7 @@ public class Notify extends MySQLRecord {
     String type;
     @MySqlAnnotation(type = MySQLUtility.type_int)
     int id_recordref;
-    @MySqlAnnotation(type = MySQLUtility.type_text)
+    @MySqlAnnotation(type = MySQLUtility.type_string)
     String state;
 
 
@@ -45,9 +48,7 @@ public class Notify extends MySQLRecord {
         this.id_receiver = id_receiver;
     }
 
-    public String getType() {
-        return type;
-    }
+    public String getType() { return type; }
 
     public void setType(String type) {
         this.type = type;

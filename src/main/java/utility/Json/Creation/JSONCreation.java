@@ -51,6 +51,13 @@ public class JSONCreation {
                         e.printStackTrace();
                     }
                 }
+                case "UserList": {
+                    try {
+                        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationDB.getJson(instance, mapper, ClassToConvert));
+                    } catch (JsonProcessingException | ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
                 case "ArrayList": {
                     return getJSONList((ArrayList<?>) instance, ClassToConvert);
                 }

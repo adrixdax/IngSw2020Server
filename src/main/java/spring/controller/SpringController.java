@@ -5,6 +5,7 @@ import DataBase.DbConnectionForBackEnd;
 import MovieDB.CineMatesTheMovieDB;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import core.Classes.*;
+import core.FireBase.FireBaseUserService;
 import core.sql.AbstractSQLRecord;
 import core.sql.FactoryRecord;
 import info.movito.themoviedbapi.model.MovieDb;
@@ -17,7 +18,10 @@ import utility.UserListType;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static MovieDB.CineMatesTheMovieDB.searchFilmByName;
 
@@ -47,7 +51,7 @@ public class SpringController {
     public String user(@RequestBody String query) {
         HTTPRequest request = null;
         try {
-            request = (HTTPRequest) JSONDecoder.getDecodedJson(query);
+            request = (HTTPRequest) JSONDecoder.getDecodedJson(query,HTTPRequest.class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -108,10 +112,10 @@ public class SpringController {
                 return JSONCreation.getJSONToCreate(lists, UserList.class.getCanonicalName());
 
             }
-        }else if (myMap.containsKey("removeList") && myMap.get("removeList").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idList")) {
+        } else if (myMap.containsKey("removeList") && myMap.get("removeList").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idList")) {
 
-            UserList list = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "where idUser='" + myMap.get("idUser") +"' and idUserList='" +myMap.get("idList")+"'");
-            if(list!=null){
+            UserList list = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "where idUser='" + myMap.get("idUser") + "' and idUserList='" + myMap.get("idList") + "'");
+            if (list != null) {
                 list.deleteRecord();
             }
 
@@ -141,8 +145,8 @@ public class SpringController {
             } else {
                 return "false";
             }
-        } else if(myMap.containsKey("isFriends") && myMap.get("isFriends").equals("true") && myMap.containsKey("idUser")){
-            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Contact.class, "(user1  ='"+myMap.get("idUser")+"') OR (user2 = '"+myMap.get("idUser")+"')"), Contact.class.getCanonicalName());
+        } else if (myMap.containsKey("isFriends") && myMap.get("isFriends").equals("true") && myMap.containsKey("idUser")) {
+            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Contact.class, "(user1  ='" + myMap.get("idUser") + "') OR (user2 = '" + myMap.get("idUser") + "')"), Contact.class.getCanonicalName());
         }
         return "";
     }
@@ -155,7 +159,7 @@ public class SpringController {
     public String registration(@RequestBody String query) {
         HTTPRequest request = null;
         try {
-            request = (HTTPRequest) JSONDecoder.getDecodedJson(query);
+            request = (HTTPRequest) JSONDecoder.getDecodedJson(query,HTTPRequest.class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -255,7 +259,7 @@ public class SpringController {
     public String film(@RequestBody String query) {
         HTTPRequest request = null;
         try {
-            request = (HTTPRequest) JSONDecoder.getDecodedJson(query);
+            request = (HTTPRequest) JSONDecoder.getDecodedJson(query,HTTPRequest.class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -343,7 +347,7 @@ public class SpringController {
     public String review(@RequestBody String query) {
         HTTPRequest request = null;
         try {
-            request = (HTTPRequest) JSONDecoder.getDecodedJson(query);
+            request = (HTTPRequest) JSONDecoder.getDecodedJson(query,HTTPRequest.class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -390,7 +394,15 @@ public class SpringController {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, UserList.class, "idUser=" + query.get("idUser")), UserList.class.getCanonicalName());
+        if (query.containsKey("idUser"))
+            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, UserList.class, "idUser=" + query.get("idUser")), UserList.class.getCanonicalName());
+        else {
+            UserList u = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn,UserList.class,"idUserList='"+query.get("idUserList")+"'");
+            System.out.println(u.getTitle());
+            String json = JSONCreation.getJSONToCreate(u, UserList.class.getCanonicalName());
+            System.out.println(json);
+            return json;
+        }
     }
 
     @GetMapping(value = "/notify")
@@ -414,28 +426,57 @@ public class SpringController {
         } else if (query.containsKey("Seen")) {
             Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Notify.class, "id_Notify=" + query.get("Seen"));
             not.setSql_connection(conn);
-            not.setState("SEEN");
+            not.setState(NotifyStatusType.SEEN.toString());
             not.updateRecord();
             return "Status Changed";
         } else if (query.containsKey("Accepted")) {
             Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Notify.class, "id_Notify=" + query.get("Accepted"));
             not.setSql_connection(conn);
-            not.setState("ACCEPTED");
-            not.updateRecord();
+            switch (not.getType()) {
+                case "LIST":{
+                    UserList nuovaLista = new UserList();
+                    nuovaLista.setSql_connection(conn);
+                    nuovaLista.setIdUser(not.getId_receiver());
+                    nuovaLista.setType(String.valueOf(UserListType.CUSTOM));
+                    UserList listaDaClonare = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "where idUserList=" + not.getId_recordref());
+                    nuovaLista.setTitle(listaDaClonare.getTitle());
+                    nuovaLista.setDescription(listaDaClonare.getDescription() + "\nTi è stata suggerita da: " + FireBaseUserService.getFireBaseUser(not.getId_sender()).getNick());
+                    nuovaLista.addRecord();
+                    List<AbstractSQLRecord> listaDiFilm = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, filminlist.class, "idList=" + not.getId_recordref());
+                    for (AbstractSQLRecord film : listaDiFilm) {
+                        filminlist nuovoFilm = new filminlist();
+                        nuovoFilm.setIdFilm(((filminlist) (film)).getIdFilm());
+                        nuovoFilm.setIdList(nuovaLista.getIdUserList());
+                        nuovoFilm.addRecord();
+                    }
+                    break;
+                }
+                case "FILM": {
+                    UserList toWatchList = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "where idUser='" + not.getId_receiver() + "' and type='TOWATCH");
+                    filminlist film = new filminlist();
+                    film.setIdList(toWatchList.getIdUserList());
+                    film.setIdFilm(not.getId_recordref());
+                    film.addRecord();
+                    break;
+                }
+                default: {
+                    not.setState(NotifyStatusType.ACCEPTED.toString());
+                    not.updateRecord();
+                }
+            }
             return "Status Changed";
         } else if (query.containsKey("Refused")) {
             Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Notify.class, "id_Notify=" + query.get("Refused"));
             not.setSql_connection(conn);
-            not.setState("REFUSED");
+            not.setState(NotifyStatusType.REFUSED.toString());
             not.updateRecord();
             return "Status Changed";
         } else if (query.containsKey("id_sender") && query.containsKey("id_receiver") && query.containsKey("type") && query.containsKey("sendNotify") && query.get("sendNotify").equals("true")) {
-
             Notify not = new Notify();
             not.setSql_connection(conn);
             not.setId_receiver(query.get("id_receiver"));
             not.setId_sender(query.get("id_sender"));
-            not.setType(query.get("type"));
+            not.setType(String.valueOf(query.get("type")));
             not.setId_recordref(Integer.parseInt(query.get("id_recordref").isEmpty() ? "0" : query.get("id_recordref")));
             not.setState(NotifyStatusType.PENDING.toString());
             not.addRecord();
@@ -461,8 +502,7 @@ public class SpringController {
     public String list(@RequestBody String query) {
         HTTPRequest request = null;
         try {
-            System.out.println("Provaaaaaaaaa: " + query);
-            request = (HTTPRequest) JSONDecoder.getDecodedJson(query);
+            request = (HTTPRequest) JSONDecoder.getDecodedJson(query,HTTPRequest.class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -473,7 +513,6 @@ public class SpringController {
                 if (checkConnection()) {
                     filminlist film = (filminlist) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, filminlist.class,
                             "where idList='" + myMap.get("idList") + "' and idFilm='" + myMap.get("idFilm") + "' ");
-
                     if (film != null) {
                         return "true";
                     } else {
