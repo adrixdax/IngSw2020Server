@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package core.Classes;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -12,9 +6,6 @@ import core.sql.MySQLRecord;
 import core.sql.MySqlAnnotation;
 import utility.MySQLUtility;
 
-/**
- * @author Antimo
- */
 public class User extends MySQLRecord {
     @MySqlAnnotation(type = MySQLUtility.type_string)
     private String idUSer;

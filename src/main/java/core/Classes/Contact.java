@@ -7,9 +7,9 @@ import utility.MySQLUtility;
 public class Contact extends MySQLRecord {
 
     @MySqlAnnotation(type = MySQLUtility.type_string)
-    private String user1 = "";
+    private String user1;
     @MySqlAnnotation(type = MySQLUtility.type_string)
-    private String user2 = "";
+    private String user2;
 
 
     public String getUser1() {

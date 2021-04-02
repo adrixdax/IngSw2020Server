@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 class JSONCreationDB {
 
-    public static ObjectNode getJson(Object instance, ObjectMapper mapper, String ClassToconvert) throws ClassNotFoundException {
+    public static ObjectNode getJsonDB(Object instance, ObjectMapper mapper, String ClassToconvert) throws ClassNotFoundException {
         Class<?> act = Class.forName(ClassToconvert);
         ObjectNode node = mapper.createObjectNode();
         for (Field field : act.getDeclaredFields()) {
@@ -35,7 +35,7 @@ class JSONCreationDB {
         try {
             ArrayNode arr = mapper.createArrayNode();
             for (Object o : list) {
-                arr.add(getJson(o, mapper, ClassesToConvert));
+                arr.add(getJsonDB(o, mapper, ClassesToConvert));
             }
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(arr);
         } catch (JsonProcessingException | ClassNotFoundException ex) {

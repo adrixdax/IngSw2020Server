@@ -46,14 +46,14 @@ public class JSONCreation {
                 }
                 case "User": {
                     try {
-                        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationDB.getJson(instance, mapper, ClassToConvert));
+                        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationDB.getJsonDB(instance, mapper, ClassToConvert));
                     } catch (JsonProcessingException | ClassNotFoundException e) {
                         e.printStackTrace();
                     }
                 }
                 case "UserList": {
                     try {
-                        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationDB.getJson(instance, mapper, ClassToConvert));
+                        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationDB.getJsonDB(instance, mapper, ClassToConvert));
                     } catch (JsonProcessingException | ClassNotFoundException e) {
                         e.printStackTrace();
                     }

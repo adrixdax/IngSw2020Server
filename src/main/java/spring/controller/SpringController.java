@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
+import java.util.Objects;
 
 import static MovieDB.CineMatesTheMovieDB.searchFilmByName;
 
@@ -30,20 +30,27 @@ import static MovieDB.CineMatesTheMovieDB.searchFilmByName;
 public class SpringController {
 
     Connection conn;
-    CineMatesTheMovieDB CineMates;
 
     public SpringController() {
         this.conn = new DbConnectionForBackEnd().getConnection();
     }
 
-
     private boolean checkConnection() throws SQLException {
         if (conn.isClosed() || conn == null) {
             this.conn = new DbConnectionForBackEnd().getConnection();
-            return true;
-        } else {
-            return true;
         }
+        return true;
+    }
+
+    private Map<String, String> getHttpRequestMap(String query) {
+        HTTPRequest request = null;
+        try {
+            request = (HTTPRequest) JSONDecoder.getDecodedJson(query,HTTPRequest.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        assert request != null;
+        return request.getMap();
     }
 
     @PostMapping(value = "/user")
@@ -124,8 +131,9 @@ public class SpringController {
 
             Contact contact = (Contact) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Contact.class, "where (user1 ='" + myMap.get("idUser") + "' And user2 ='" + myMap.get("idOtherUser") + "') " +
                     "OR (user1 = '" + myMap.get("idOtherUser") + "' AND user2 ='" + myMap.get("idUser") + "' )");
-
             if (contact == null) {
+                Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn,Notify.class,"where (id_sender='"+myMap.get("idUser")+"' and id_receiver='"+myMap.get("idOtherUser")+"') or (id_sender='"+myMap.get("idOtherUser")+"' and id_receiver='"+myMap.get("idUser")+"')");
+                not.setState(NotifyStatusType.ACCEPTED.toString());
                 contact = new Contact();
                 contact.setUser1(myMap.get("idUser"));
                 contact.setUser2(myMap.get("idOtherUser"));
@@ -151,20 +159,10 @@ public class SpringController {
         return "";
     }
 
-    //ip:8080/user?nickname=nick
-    //ip:8080/user?user=iduserRequestingContactList
-
     @PostMapping(value = "/registration")
     @ResponseBody
     public String registration(@RequestBody String query) {
-        HTTPRequest request = null;
-        try {
-            request = (HTTPRequest) JSONDecoder.getDecodedJson(query,HTTPRequest.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        assert request != null;
-        Map<String, String> myMap = request.getMap();
+        Map<String,String> myMap = getHttpRequestMap(query);
         if (myMap.containsKey("registration")) {
             try {
                 if (checkConnection()) {
@@ -253,18 +251,10 @@ public class SpringController {
         return "";
     }
 
-
-    @PostMapping(value = "/film")  //verificare se è il caso di farla diventare una POST
+    @PostMapping(value = "/film")
     @ResponseBody
     public String film(@RequestBody String query) {
-        HTTPRequest request = null;
-        try {
-            request = (HTTPRequest) JSONDecoder.getDecodedJson(query,HTTPRequest.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        assert request != null;
-        Map<String, String> myMap = request.getMap();
+        Map<String,String> myMap = getHttpRequestMap(query);
         if (myMap.containsKey("latest") && myMap.get("latest").equals("true")) {
             return JSONCreation.getJSONToCreate(CineMatesTheMovieDB.comingSoon(), MovieDb.class.getSimpleName());
         }
@@ -325,8 +315,7 @@ public class SpringController {
         if (myMap.containsKey("filmId"))
             return JSONCreation.getJSONToCreate(CineMatesTheMovieDB.searchFilmById(Integer.parseInt(myMap.get("filmId"))), MovieDb.class.getSimpleName());
         if (myMap.containsKey("year") && myMap.containsKey("adult")) {
-            String str = JSONCreation.getJSONToCreate(searchFilmByName(myMap.get("name"), Integer.parseInt(myMap.get("year")), Boolean.parseBoolean(myMap.get("adult"))), MovieDb.class.getSimpleName());
-            return str;
+            return JSONCreation.getJSONToCreate(searchFilmByName(myMap.get("name"), Integer.parseInt(myMap.get("year")), Boolean.parseBoolean(myMap.get("adult"))), MovieDb.class.getSimpleName());
         } else {
             if (myMap.containsKey("year"))
                 return JSONCreation.getJSONToCreate(searchFilmByName(myMap.get("name"), Integer.parseInt(myMap.get("year"))), MovieDb.class.getSimpleName());
@@ -336,23 +325,11 @@ public class SpringController {
                 return JSONCreation.getJSONToCreate(searchFilmByName(myMap.get("name")), MovieDb.class.getSimpleName());
         }
     }
-    //ip:8080/film?filmId=id
-    //ip:8080/film?name=name
-    //ip:8080/film?name=name&adult=true
-    //ip:8080/film?name=name&year=0000
-    //ip:8080/film?name=name&year=0000&adult=false
 
     @PostMapping(value = "/review")
     @ResponseBody
     public String review(@RequestBody String query) {
-        HTTPRequest request = null;
-        try {
-            request = (HTTPRequest) JSONDecoder.getDecodedJson(query,HTTPRequest.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        assert request != null;
-        Map<String, String> myMap = request.getMap();
+        Map<String,String> myMap = getHttpRequestMap(query);
         if (myMap.containsKey("idFilm") && myMap.containsKey("title") && myMap.containsKey("description") && myMap.containsKey("val") && myMap.containsKey("idUser") && myMap.containsKey("insert") && myMap.get("insert").equals("true")) {
             try {
                 checkConnection();
@@ -381,10 +358,6 @@ public class SpringController {
         }
         return "";
     }
-
-    //ip:8080/review?filmId=id
-    //ip:8080/review?iduser=id
-
 
     @GetMapping(value = "/list")
     @ResponseBody
@@ -432,15 +405,20 @@ public class SpringController {
         } else if (query.containsKey("Accepted")) {
             Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Notify.class, "id_Notify=" + query.get("Accepted"));
             not.setSql_connection(conn);
+            not.setState(NotifyStatusType.ACCEPTED.toString());
+            not.updateRecord();
             switch (not.getType()) {
                 case "LIST":{
+                    UserList esisteLista = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn,UserList.class,"dependency_List="+not.getId_recordref()+" and idUser='"+not.getId_receiver()+"'");
+                    if (esisteLista != null)
+                        esisteLista.deleteRecord();
                     UserList nuovaLista = new UserList();
                     nuovaLista.setSql_connection(conn);
                     nuovaLista.setIdUser(not.getId_receiver());
                     nuovaLista.setType(String.valueOf(UserListType.CUSTOM));
                     UserList listaDaClonare = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "where idUserList=" + not.getId_recordref());
                     nuovaLista.setTitle(listaDaClonare.getTitle());
-                    nuovaLista.setDescription(listaDaClonare.getDescription() + "\nTi è stata suggerita da: " + FireBaseUserService.getFireBaseUser(not.getId_sender()).getNick());
+                    nuovaLista.setDescription(listaDaClonare.getDescription() + "\nTi è stata suggerita da: " + Objects.requireNonNull(FireBaseUserService.getFireBaseUser(not.getId_sender())).getNick());
                     nuovaLista.addRecord();
                     List<AbstractSQLRecord> listaDiFilm = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, filminlist.class, "idList=" + not.getId_recordref());
                     for (AbstractSQLRecord film : listaDiFilm) {
@@ -458,10 +436,6 @@ public class SpringController {
                     film.setIdFilm(not.getId_recordref());
                     film.addRecord();
                     break;
-                }
-                default: {
-                    not.setState(NotifyStatusType.ACCEPTED.toString());
-                    not.updateRecord();
                 }
             }
             return "Status Changed";
@@ -486,28 +460,10 @@ public class SpringController {
         return "[]";
     }
 
-    //ip:8080/list?userId=id
-
-
-    @PostMapping(value = "/todecide")
-    @ResponseBody
-    public String insertFilm(@RequestBody String json) {
-        System.out.println(json);
-        return json;
-    }
-
-
     @PostMapping(value = "/list")
     @ResponseBody
     public String list(@RequestBody String query) {
-        HTTPRequest request = null;
-        try {
-            request = (HTTPRequest) JSONDecoder.getDecodedJson(query,HTTPRequest.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        assert request != null;
-        Map<String, String> myMap = request.getMap();
+        Map<String,String> myMap = getHttpRequestMap(query);
         if (myMap.containsKey("idList") && myMap.containsKey("idFilm") && ((!myMap.containsKey("addFilm")) && (!myMap.containsKey("removeFilm")))) {
             try {
                 if (checkConnection()) {
@@ -562,21 +518,7 @@ public class SpringController {
             return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
 
         }
-
         return "";
     }
-
-
-    @RequestMapping(value = "/test")
-    public String test() {
-        List<Contact> cont = new ArrayList<>();
-        List<AbstractSQLRecord> rec = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Contact.class, "");
-        for (AbstractSQLRecord record : rec)
-            cont.add((Contact) record);
-        return "Hello World!";
-    }
-    //ip:8080/insertFilm      json
-    //better to build with HTTP Builder apache tomcat
-    //mapping with application/json
 
 }

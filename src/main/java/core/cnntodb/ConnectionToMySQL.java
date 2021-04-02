@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package core.cnntodb;
 
 import java.sql.Connection;
@@ -12,10 +7,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author Antimo
- */
+
 public class ConnectionToMySQL {
 
     private String connectionString = "";
@@ -75,11 +67,9 @@ public class ConnectionToMySQL {
             PreparedStatement st = connection.prepareStatement("use " + getNameDB());
             st.execute();
             st.close();
-            if(connection!= null){
-                System.out.println("schema  ->  " + connection.getSchema() + "  connessione  ->" + connection.getClientInfo());
-                return connection;
-            }
-            
+            System.out.println("schema  ->  " + connection.getSchema() + "  connessione  ->" + connection.getClientInfo());
+            return connection;
+
         } catch (SQLException ex) {
             Logger.getLogger(ConnectionToMySQL.class.getName()).log(Level.SEVERE, null, ex);
         }

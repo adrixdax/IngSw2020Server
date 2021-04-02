@@ -2,7 +2,6 @@ package core.FireBase;
 
 import core.Classes.User;
 import org.apache.http.client.fluent.Content;
-import org.apache.http.client.fluent.Form;
 import org.apache.http.client.fluent.Request;
 import org.springframework.stereotype.Service;
 import utility.Json.Decode.JSONDecoder;
@@ -12,7 +11,7 @@ import java.io.IOException;
 @Service
 public
 class FireBaseUserService {
-    public static final String COL_NAME="Users";
+    private static final String COL_NAME="Users";
 
     public static User getFireBaseUser(String uid){
         try {
