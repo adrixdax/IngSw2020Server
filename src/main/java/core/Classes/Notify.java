@@ -8,6 +8,8 @@ import utility.MySQLUtility;
 import utility.NotifyStatusType;
 import utility.NotifyTypes;
 
+import java.util.Date;
+
 public class Notify extends MySQLRecord {
 
     @MySqlAnnotation(type = MySQLUtility.type_int)
@@ -22,6 +24,8 @@ public class Notify extends MySQLRecord {
     int id_recordref;
     @MySqlAnnotation(type = MySQLUtility.type_string)
     String state;
+    @MySqlAnnotation(type = MySQLUtility.type_long)
+    long dateOfSend = 0;
 
 
     public int getId_Notify() {
@@ -48,7 +52,9 @@ public class Notify extends MySQLRecord {
         this.id_receiver = id_receiver;
     }
 
-    public String getType() { return type; }
+    public String getType() {
+        return type;
+    }
 
     public void setType(String type) {
         this.type = type;
@@ -70,4 +76,11 @@ public class Notify extends MySQLRecord {
         this.state = state;
     }
 
+    public long getDateOfSend() {
+        return dateOfSend;
+    }
+
+    public void setDateOfSend(long dateOfSend) {
+        this.dateOfSend = dateOfSend;
+    }
 }

@@ -18,10 +18,7 @@ import utility.UserListType;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static MovieDB.CineMatesTheMovieDB.searchFilmByName;
 
@@ -45,7 +42,7 @@ public class SpringController {
     private Map<String, String> getHttpRequestMap(String query) {
         HTTPRequest request = null;
         try {
-            request = (HTTPRequest) JSONDecoder.getDecodedJson(query,HTTPRequest.class);
+            request = (HTTPRequest) JSONDecoder.getDecodedJson(query, HTTPRequest.class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -58,7 +55,7 @@ public class SpringController {
     public String user(@RequestBody String query) {
         HTTPRequest request = null;
         try {
-            request = (HTTPRequest) JSONDecoder.getDecodedJson(query,HTTPRequest.class);
+            request = (HTTPRequest) JSONDecoder.getDecodedJson(query, HTTPRequest.class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -132,7 +129,7 @@ public class SpringController {
             Contact contact = (Contact) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Contact.class, "where (user1 ='" + myMap.get("idUser") + "' And user2 ='" + myMap.get("idOtherUser") + "') " +
                     "OR (user1 = '" + myMap.get("idOtherUser") + "' AND user2 ='" + myMap.get("idUser") + "' )");
             if (contact == null) {
-                Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn,Notify.class,"where (id_sender='"+myMap.get("idUser")+"' and id_receiver='"+myMap.get("idOtherUser")+"') or (id_sender='"+myMap.get("idOtherUser")+"' and id_receiver='"+myMap.get("idUser")+"')");
+                Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Notify.class, "where (id_sender='" + myMap.get("idUser") + "' and id_receiver='" + myMap.get("idOtherUser") + "') or (id_sender='" + myMap.get("idOtherUser") + "' and id_receiver='" + myMap.get("idUser") + "')");
                 not.setState(NotifyStatusType.ACCEPTED.toString());
                 contact = new Contact();
                 contact.setUser1(myMap.get("idUser"));
@@ -162,7 +159,7 @@ public class SpringController {
     @PostMapping(value = "/registration")
     @ResponseBody
     public String registration(@RequestBody String query) {
-        Map<String,String> myMap = getHttpRequestMap(query);
+        Map<String, String> myMap = getHttpRequestMap(query);
         if (myMap.containsKey("registration")) {
             try {
                 if (checkConnection()) {
@@ -254,7 +251,7 @@ public class SpringController {
     @PostMapping(value = "/film")
     @ResponseBody
     public String film(@RequestBody String query) {
-        Map<String,String> myMap = getHttpRequestMap(query);
+        Map<String, String> myMap = getHttpRequestMap(query);
         if (myMap.containsKey("latest") && myMap.get("latest").equals("true")) {
             return JSONCreation.getJSONToCreate(CineMatesTheMovieDB.comingSoon(), MovieDb.class.getSimpleName());
         }
@@ -329,7 +326,7 @@ public class SpringController {
     @PostMapping(value = "/review")
     @ResponseBody
     public String review(@RequestBody String query) {
-        Map<String,String> myMap = getHttpRequestMap(query);
+        Map<String, String> myMap = getHttpRequestMap(query);
         if (myMap.containsKey("idFilm") && myMap.containsKey("title") && myMap.containsKey("description") && myMap.containsKey("val") && myMap.containsKey("idUser") && myMap.containsKey("insert") && myMap.get("insert").equals("true")) {
             try {
                 checkConnection();
@@ -359,6 +356,20 @@ public class SpringController {
         return "";
     }
 
+    @GetMapping(value = "/review")
+    @ResponseBody
+    public String review(@RequestParam Map<String, String> query) {
+        if (query.containsKey("idReview")) {
+            try {
+                checkConnection();
+                return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getSingleRecord(conn,reviews.class,"idReview='"+query.get("idReview")+"'"),reviews.class.getCanonicalName());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return "";
+    }
+
     @GetMapping(value = "/list")
     @ResponseBody
     public String list(@RequestParam Map<String, String> query) {
@@ -370,7 +381,7 @@ public class SpringController {
         if (query.containsKey("idUser"))
             return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, UserList.class, "idUser=" + query.get("idUser")), UserList.class.getCanonicalName());
         else {
-            UserList u = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn,UserList.class,"idUserList='"+query.get("idUserList")+"'");
+            UserList u = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "idUserList='" + query.get("idUserList") + "'");
             System.out.println(u.getTitle());
             String json = JSONCreation.getJSONToCreate(u, UserList.class.getCanonicalName());
             System.out.println(json);
@@ -408,8 +419,8 @@ public class SpringController {
             not.setState(NotifyStatusType.ACCEPTED.toString());
             not.updateRecord();
             switch (not.getType()) {
-                case "LIST":{
-                    UserList esisteLista = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn,UserList.class,"dependency_List="+not.getId_recordref()+" and idUser='"+not.getId_receiver()+"'");
+                case "LIST": {
+                    UserList esisteLista = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "dependency_List=" + not.getId_recordref() + " and idUser='" + not.getId_receiver() + "'");
                     if (esisteLista != null)
                         esisteLista.deleteRecord();
                     UserList nuovaLista = new UserList();
@@ -446,24 +457,67 @@ public class SpringController {
             not.updateRecord();
             return "Status Changed";
         } else if (query.containsKey("id_sender") && query.containsKey("id_receiver") && query.containsKey("type") && query.containsKey("sendNotify") && query.get("sendNotify").equals("true")) {
-            Notify not = new Notify();
-            not.setSql_connection(conn);
-            not.setId_receiver(query.get("id_receiver"));
-            not.setId_sender(query.get("id_sender"));
-            not.setType(String.valueOf(query.get("type")));
-            not.setId_recordref(Integer.parseInt(query.get("id_recordref").isEmpty() ? "0" : query.get("id_recordref")));
-            not.setState(NotifyStatusType.PENDING.toString());
-            not.addRecord();
 
-            return "Notifica inviata con successo";
-        }
+            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Rome"), Locale.ITALY);
+            Calendar cal2 = Calendar.getInstance(TimeZone.getTimeZone("Europe/Rome"), Locale.ITALY);
+
+
+            List<AbstractSQLRecord> sql = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Notify.class,
+                    "where id_receiver='" + query.get("id_receiver") +
+                            "' and id_sender='" + query.get("id_sender") +
+                            "' and type='" + query.get("type") +
+                            "' and id_recordref='" + (Integer.parseInt(query.get("id_recordref").isEmpty() ? "0" : query.get("id_recordref"))) +
+                            "' order by  dateOfSend DESC");
+
+            Notify not = new Notify();
+            for (AbstractSQLRecord record : sql) {
+                Notify tmp = (Notify) record;
+                if(not!=null){
+                    if(not.getDateOfSend()< tmp.getDateOfSend()){
+                        not=tmp;
+                    }
+                }else{
+                    not=tmp;
+                }
+            }
+
+                cal2.setTimeInMillis(not.getDateOfSend());
+                cal2.add(Calendar.WEEK_OF_YEAR, 1);
+                if (cal2.getTimeInMillis() < cal.getTimeInMillis()) {
+                        not = new Notify();
+                        not.setSql_connection(conn);
+                        not.setId_receiver(query.get("id_receiver"));
+                        not.setId_sender(query.get("id_sender"));
+                        not.setType(String.valueOf(query.get("type")));
+                        not.setId_recordref(Integer.parseInt(query.get("id_recordref").isEmpty() ? "0" : query.get("id_recordref")));
+                        not.setState(NotifyStatusType.PENDING.toString());
+                        not.setDateOfSend(cal.getTimeInMillis());
+                        not.addRecord();
+
+                        return "Notifica inviata con successo";
+
+                    } else if (not.getType().equals("LIST")) {
+                        not = new Notify();
+                        not.setSql_connection(conn);
+                        not.setId_receiver(query.get("id_receiver"));
+                        not.setId_sender(query.get("id_sender"));
+                        not.setType(String.valueOf(query.get("type")));
+                        not.setId_recordref(Integer.parseInt(query.get("id_recordref").isEmpty() ? "0" : query.get("id_recordref")));
+                        not.setState(NotifyStatusType.PENDING.toString());
+                        not.setDateOfSend(cal.getTimeInMillis());
+                        not.addRecord();
+                    }
+
+                }
+
+
         return "[]";
     }
 
     @PostMapping(value = "/list")
     @ResponseBody
     public String list(@RequestBody String query) {
-        Map<String,String> myMap = getHttpRequestMap(query);
+        Map<String, String> myMap = getHttpRequestMap(query);
         if (myMap.containsKey("idList") && myMap.containsKey("idFilm") && ((!myMap.containsKey("addFilm")) && (!myMap.containsKey("removeFilm")))) {
             try {
                 if (checkConnection()) {
