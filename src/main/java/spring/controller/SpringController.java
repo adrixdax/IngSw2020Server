@@ -430,6 +430,7 @@ public class SpringController {
                     UserList listaDaClonare = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "where idUserList=" + not.getId_recordref());
                     nuovaLista.setTitle(listaDaClonare.getTitle());
                     nuovaLista.setDescription(listaDaClonare.getDescription() + "\nTi è stata suggerita da: " + Objects.requireNonNull(FireBaseUserService.getFireBaseUser(not.getId_sender())).getNick());
+                    nuovaLista.setDependency_List(listaDaClonare.getIdUserList());
                     nuovaLista.addRecord();
                     List<AbstractSQLRecord> listaDiFilm = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, filminlist.class, "idList=" + not.getId_recordref());
                     for (AbstractSQLRecord film : listaDiFilm) {
