@@ -10,12 +10,10 @@ import java.util.Scanner;
 
 public class DbConnectionForBackEnd {
     private static Connection con;
-    private static final File config = new File("src/main/java/DataBase/config");
-    private final String linkToDb = "jdbc:mysql://87.1.139.228:3306";
+    private static final File config = new File("./config");
     private String user = "Adriano";
     private String pw = "IngSw2020!";
     private String schema = "Cinemates20Development";
-    private final String version = "";
 
     public DbConnectionForBackEnd() {
         createConnection();
@@ -54,6 +52,7 @@ public class DbConnectionForBackEnd {
     public boolean createConnection() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
+            String linkToDb = "jdbc:mysql://87.1.139.228:3306";
             con = DriverManager.getConnection(linkToDb, user, pw);
             String command = "use "+schema;
             PreparedStatement st = con.prepareStatement(command);
@@ -68,12 +67,4 @@ public class DbConnectionForBackEnd {
         return con;
     }
 
-    public void test() {
-        //this.recoverPW();
-        //this.recoverSchema();
-        //this.recoverUser();
-        System.out.println(user + " " + pw + " " + schema);
-        System.out.println(createConnection());
-
-    }
 }

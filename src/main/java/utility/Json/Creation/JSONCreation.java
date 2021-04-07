@@ -44,22 +44,15 @@ public class JSONCreation {
                         ex.printStackTrace();
                     }
                 }
-                case "User": {
-                    try {
-                        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationDB.getJsonDB(instance, mapper, ClassToConvert));
-                    } catch (JsonProcessingException | ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
-                case "UserList": {
-                    try {
-                        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationDB.getJsonDB(instance, mapper, ClassToConvert));
-                    } catch (JsonProcessingException | ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
                 case "ArrayList": {
                     return getJSONList((ArrayList<?>) instance, ClassToConvert);
+                }
+                default: {
+                    try {
+                        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationDB.getJsonDB(instance, mapper, ClassToConvert));
+                    } catch (JsonProcessingException | ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         } else {

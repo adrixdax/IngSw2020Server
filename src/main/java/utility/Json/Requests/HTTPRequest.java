@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HTTPRequest {
-    private String request="";
-    private Map<String,String> map;
+    private String request = "";
+    private final Map<String, String> map;
 
     public HTTPRequest(String command, String req){
         request=req;
@@ -19,13 +19,6 @@ public class HTTPRequest {
             map.put(keyValue[0], keyValue[1]);
         }
     }
-
-
-    public HTTPRequest(){
-
-    }
-
-
 
     public Map<String, String> getMap() {
         return map;

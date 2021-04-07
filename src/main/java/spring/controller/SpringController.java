@@ -71,9 +71,9 @@ public class SpringController {
                 if (checkConnection()) {
                     return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, UserList.class,
                             "idUser = '" + myMap.get("idUser") + "' " +
-                                    " and (type='" + UserListType.PREFERED.toString() + "' " +
-                                    " OR type='" + UserListType.WATCH.toString() +
-                                    "' OR type='" + UserListType.TOWATCH.toString() + "' )"), UserList.class.getCanonicalName());
+                                    " and (type='" + UserListType.PREFERED + "' " +
+                                    " OR type='" + UserListType.WATCH +
+                                    "' OR type='" + UserListType.TOWATCH + "' )"), UserList.class.getCanonicalName());
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -85,7 +85,7 @@ public class SpringController {
             list.setSql_connection(conn);
             list.setType(UserListType.CUSTOM.toString());
             list.setTitle(myMap.get("listTitle"));
-            list.setDescription(myMap.get("listDescription"));
+            list.setDescription(myMap.getOrDefault("listDescription", "\0"));
             list.setIdUser(myMap.get("idUser"));
             list.addRecord();
 
@@ -95,7 +95,7 @@ public class SpringController {
         if (myMap.containsKey("custom") && myMap.get("custom").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idFilm")) {
 
             List<AbstractSQLRecord> lists = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, UserList.class, "idUser = '" + myMap.get("idUser") + "' " +
-                    " and type='" + UserListType.CUSTOM.toString() + "'");
+                    " and type='" + UserListType.CUSTOM + "'");
 
             if (!myMap.get("idFilm").equals("-1")) {
                 if (lists != null) {
@@ -362,7 +362,7 @@ public class SpringController {
         if (query.containsKey("idReview")) {
             try {
                 checkConnection();
-                return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getSingleRecord(conn,reviews.class,"idReview='"+query.get("idReview")+"'"),reviews.class.getCanonicalName());
+                return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getSingleRecord(conn, reviews.class, "id_review=" + query.get("idReview")), reviews.class.getCanonicalName());
             } catch (Exception e) {
                 e.printStackTrace();
             }
