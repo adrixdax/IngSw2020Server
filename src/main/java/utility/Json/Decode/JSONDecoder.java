@@ -11,7 +11,7 @@ public class JSONDecoder {
         ObjectMapper mapper = new ObjectMapper();
         if (toConvert.equals(HTTPRequest.class)) {
             if (json.contains("Type=PostRequest")) {
-                return new HTTPRequest(json.substring(json.indexOf('&') + 1), "Post");
+                return new HTTPRequest(json.substring(json.indexOf('&') + 1));
             }
             return null;
         }

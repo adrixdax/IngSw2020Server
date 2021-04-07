@@ -4,11 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HTTPRequest {
-    private String request = "";
     private final Map<String, String> map;
 
-    public HTTPRequest(String command, String req){
-        request=req;
+    public HTTPRequest(String command) {
         map = new HashMap<>();
         String[] pairs = command.split("&");
         for (String pair : pairs) {
