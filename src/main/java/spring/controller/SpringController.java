@@ -78,7 +78,6 @@ public class SpringController {
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
-
         }
         if (myMap.containsKey("addList") && myMap.get("addList").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("listTitle")) {
             UserList list = new UserList();
@@ -88,44 +87,14 @@ public class SpringController {
             list.setDescription(myMap.getOrDefault("listDescription", "\0"));
             list.setIdUser(myMap.get("idUser"));
             list.addRecord();
-
             return "Lista aggiunta con successo";
-
         }
-        if (myMap.containsKey("custom") && myMap.get("custom").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idFilm")) {
-
-            List<AbstractSQLRecord> lists = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, UserList.class, "idUser = '" + myMap.get("idUser") + "' " +
-                    " and type='" + UserListType.CUSTOM + "'");
-
-            if (!myMap.get("idFilm").equals("-1")) {
-                if (lists != null) {
-                    List<UserList> listToReturn = new ArrayList<>();
-                    for (AbstractSQLRecord single : lists) {
-                        UserList s = (UserList) single;
-                        filminlist listToJump = (filminlist) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, filminlist.class, " idList ='" + s.getIdUserList() + "' and idFilm='" + myMap.get("idFilm") + "' ");
-                        if (listToJump == null) {
-                            listToReturn.add(s);
-                        }
-
-                    }
-                    return JSONCreation.getJSONToCreate(listToReturn, UserList.class.getCanonicalName());
-                }
-
-
-            } else {
-                return JSONCreation.getJSONToCreate(lists, UserList.class.getCanonicalName());
-
-            }
-        } else if (myMap.containsKey("removeList") && myMap.get("removeList").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idList")) {
-
+        if (myMap.containsKey("removeList") && myMap.get("removeList").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idList")) {
             UserList list = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "where idUser='" + myMap.get("idUser") + "' and idUserList='" + myMap.get("idList") + "'");
             if (list != null) {
                 list.deleteRecord();
             }
-
-
         } else if (myMap.containsKey("addFriends") && myMap.get("addFriends").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idOtherUser")) {
-
             Contact contact = (Contact) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Contact.class, "where (user1 ='" + myMap.get("idUser") + "' And user2 ='" + myMap.get("idOtherUser") + "') " +
                     "OR (user1 = '" + myMap.get("idOtherUser") + "' AND user2 ='" + myMap.get("idUser") + "' )");
             if (contact == null) {
@@ -139,12 +108,9 @@ public class SpringController {
             } else {
                 return "Utenti già Amici";
             }
-
         } else if (myMap.containsKey("isFriends") && myMap.get("isFriends").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idOtherUser")) {
-
             Contact contact = (Contact) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Contact.class, "where (user1 ='" + myMap.get("idUser") + "' And user2 ='" + myMap.get("idOtherUser") + "') " +
                     "OR (user1 = '" + myMap.get("idOtherUser") + "' AND user2 ='" + myMap.get("idUser") + "' )");
-
             if (contact != null) {
                 return "true";
             } else {
@@ -309,9 +275,9 @@ public class SpringController {
                 return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
             }
         }
-        if (myMap.containsKey("filmId"))
+        if (myMap.containsKey("filmId")) {
             return JSONCreation.getJSONToCreate(CineMatesTheMovieDB.searchFilmById(Integer.parseInt(myMap.get("filmId"))), MovieDb.class.getSimpleName());
-        if (myMap.containsKey("year") && myMap.containsKey("adult")) {
+        }if (myMap.containsKey("year") && myMap.containsKey("adult")) {
             return JSONCreation.getJSONToCreate(searchFilmByName(myMap.get("name"), Integer.parseInt(myMap.get("year")), Boolean.parseBoolean(myMap.get("adult"))), MovieDb.class.getSimpleName());
         } else {
             if (myMap.containsKey("year"))
@@ -473,7 +439,7 @@ public class SpringController {
             Notify not = new Notify();
             for (AbstractSQLRecord record : sql) {
                 Notify tmp = (Notify) record;
-                if(not!=null){
+                if(tmp!=null){
                     if(not.getDateOfSend()< tmp.getDateOfSend()){
                         not=tmp;
                     }
@@ -519,7 +485,31 @@ public class SpringController {
     @ResponseBody
     public String list(@RequestBody String query) {
         Map<String, String> myMap = getHttpRequestMap(query);
-        if (myMap.containsKey("idList") && myMap.containsKey("idFilm") && ((!myMap.containsKey("addFilm")) && (!myMap.containsKey("removeFilm")))) {
+        if (myMap.containsKey("custom") && myMap.get("custom").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idFilm")) {
+
+            List<AbstractSQLRecord> lists = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, UserList.class, "idUser = '" + myMap.get("idUser") + "' " +
+                    " and type='" + UserListType.CUSTOM + "'");
+
+            if (!myMap.get("idFilm").equals("-1")) {
+                if (lists != null) {
+                    List<UserList> listToReturn = new ArrayList<>();
+                    for (AbstractSQLRecord single : lists) {
+                        UserList s = (UserList) single;
+                        filminlist listToJump = (filminlist) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, filminlist.class, " idList ='" + s.getIdUserList() + "' and idFilm='" + myMap.get("idFilm") + "' ");
+                        if (listToJump == null) {
+                            listToReturn.add(s);
+                        }
+
+                    }
+                    return JSONCreation.getJSONToCreate(listToReturn, UserList.class.getCanonicalName());
+                }
+
+
+            } else {
+                return JSONCreation.getJSONToCreate(lists, UserList.class.getCanonicalName());
+
+            }
+        } else if (myMap.containsKey("idList") && myMap.containsKey("idFilm") && ((!myMap.containsKey("addFilm")) && (!myMap.containsKey("removeFilm")))) {
             try {
                 if (checkConnection()) {
                     filminlist film = (filminlist) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, filminlist.class,
@@ -545,7 +535,7 @@ public class SpringController {
             film.setIdFilm(Integer.parseInt(myMap.get("idFilm")));
             film.setIdList(Integer.parseInt(myMap.get("idList")));
             film.addRecord();
-            return "Film aggiunto con successo";
+            return "true";
 
         } else if (myMap.containsKey("idList") && myMap.containsKey("idFilm") && myMap.containsKey("removeFilm") && myMap.get("removeFilm").equals("true")) {
             try {

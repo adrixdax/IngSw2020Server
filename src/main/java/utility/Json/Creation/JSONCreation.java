@@ -32,7 +32,7 @@ public class JSONCreation {
             switch (instance.getClass().getSimpleName()) {
                 case "MovieDb": {
                     try {
-                        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationMovieDb.getJsonFilmInfo((MovieDb) instance, mapper));
+                        return "["+mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationMovieDb.getJsonFilmInfo((MovieDb) instance, mapper))+"]";
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
