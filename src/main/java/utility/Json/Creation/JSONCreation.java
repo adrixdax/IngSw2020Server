@@ -23,7 +23,7 @@ public class JSONCreation {
                 return getJsonListDB(instance, mapper, ClassToConvert);
             }
         }
-        return "";
+        return "[]";
     }
 
 
