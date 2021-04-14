@@ -46,20 +46,14 @@ class JSONCreationMovieDb {
         film.put("plot", instance.getOverview());
         if (instance.getPosterPath() != null) {
             film.put("posterPath", firstPartOfPath + instance.getPosterPath());
-        } else {
-            film.put("posterPath", "");
         }
         film.put("release_Date", instance.getReleaseDate());
         film.put("runtime", instance.getRuntime());
         if ((instance.getCast() != null) && (instance.getGenres().size() > 0)) {
             film.put("genres", getJsonGenreList(instance.getGenres(), mapper));
-        } else {
-            film.put("genres", "");
         }
         if (instance.getCast() != null) {
             film.put("cast", getJsonActorList(instance.getCast(), mapper));
-        } else {
-            film.put("cast", "");
         }
         if (instance instanceof MovieDbExtended){
             film.put("counter", ((MovieDbExtended) instance).getCounter());
