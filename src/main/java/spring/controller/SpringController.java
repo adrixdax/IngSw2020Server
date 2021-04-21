@@ -14,6 +14,7 @@ import utility.Json.Creation.JSONCreation;
 import utility.Json.Decode.JSONDecoder;
 import utility.Json.Requests.HTTPRequest;
 import utility.NotifyStatusType;
+import utility.ReportType;
 import utility.UserListType;
 
 import java.sql.Connection;
