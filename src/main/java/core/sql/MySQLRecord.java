@@ -101,17 +101,15 @@ public class MySQLRecord extends AbstractSQLRecord {
     }
 
     private String _getPrimaryKeyID() {
-        String rest = "";
-
+        String primaryKey = "";
         try {
             Class c = this.getClass();
             Method metodo = c.getMethod("getId" + c.getSimpleName());
-            rest = String.valueOf(metodo.invoke(this));
+            primaryKey = String.valueOf(metodo.invoke(this));
         } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException ex) {
             Logger.getLogger(MySQLRecord.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        return rest;
+        return primaryKey;
     }
 
     public String getUpdateCommand() {

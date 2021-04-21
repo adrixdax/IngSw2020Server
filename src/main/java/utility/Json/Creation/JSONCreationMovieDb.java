@@ -58,11 +58,6 @@ class JSONCreationMovieDb {
         if (instance instanceof MovieDbExtended){
             film.put("counter", ((MovieDbExtended) instance).getCounter());
         }
-        try {
-            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(film);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
         return film;
     }
 

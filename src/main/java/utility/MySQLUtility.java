@@ -155,9 +155,7 @@ public class MySQLUtility {
                 st.execute(sqlUpdate);
                 st.close();
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(MySQLUtility.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
+        } catch (SQLException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
             Logger.getLogger(MySQLUtility.class.getName()).log(Level.SEVERE, null, ex);
         }
 

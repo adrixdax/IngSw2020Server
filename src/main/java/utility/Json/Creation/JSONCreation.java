@@ -30,16 +30,10 @@ public class JSONCreation {
     public static String getJSONToCreate(Object instance, String ClassToConvert) {
         if (instance != null) {
             switch (instance.getClass().getSimpleName()) {
-                case "MovieDb": {
+                case "MovieDb":
+                case "MovieDbExtende":{
                     try {
                         return "["+mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationMovieDb.getJsonFilmInfo((MovieDb) instance, mapper))+"]";
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
-                case "MovieDbExtended": {
-                    try {
-                        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationMovieDb.getJsonFilmInfo((MovieDbExtended) instance, mapper));
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }

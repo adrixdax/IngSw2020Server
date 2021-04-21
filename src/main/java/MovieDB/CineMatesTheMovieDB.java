@@ -24,9 +24,7 @@ public class CineMatesTheMovieDB {
             List<MovieDb> films = new ArrayList<>();
                 MovieResultsPage newmovies = generalSearchService.searchMovie(filmName, searchYear, "it", adultEnable, 0);
                 if (newmovies.getTotalResults() > 0) {
-                    for (int j = 0; j < newmovies.getResults().size(); j++) {
-                        films.add(searchFilmById(newmovies.getResults().get(j).getId()));
-                    }
+                    films.addAll(newmovies.getResults());
                 }
             return films;
         }
@@ -47,13 +45,10 @@ public class CineMatesTheMovieDB {
     }
 
     public static List<MovieDb> comingSoon(){
-        int value=singleMovieSearch.getUpcoming("it",0,"EU").getTotalResults();
         ArrayList<MovieDb> list = new ArrayList<>();
-        //list= (ArrayList<MovieDb>) singleMovieSearch.getUpcoming("it",0,"").getResults();
         for (int i=0; i<10; i++){
             list.add(singleMovieSearch.getUpcoming("it",0,"").getResults().get(i));
         }
-
         return list;
     }
 
