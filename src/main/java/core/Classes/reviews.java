@@ -14,9 +14,11 @@ public class reviews extends MySQLRecord {
     @MySqlAnnotation(type = MySQLUtility.type_double)
     private double val;
     @MySqlAnnotation(type = MySQLUtility.type_int)
-    private int idFilm;
+    private int idRecordRef;
     @MySqlAnnotation(type = MySQLUtility.type_string)
     private String iduser;
+    @MySqlAnnotation(type = MySQLUtility.type_string)
+    private String typeOfReview;
 
     public int getId_review() {
         return id_review;
@@ -50,12 +52,12 @@ public class reviews extends MySQLRecord {
         this.val = val;
     }
 
-    public int getIdFilm() {
-        return idFilm;
+    public int getIdRecordRef() {
+        return idRecordRef;
     }
 
-    public void setIdFilm(int idFilm) {
-        this.idFilm = idFilm;
+    public void setIdRecordRef(int idRecordRef) {
+        this.idRecordRef = idRecordRef;
     }
 
     public String getIduser() {
@@ -64,5 +66,13 @@ public class reviews extends MySQLRecord {
 
     public void setIduser(String iduser) {
         this.iduser = iduser;
+    }
+
+    public String getTypeOfReview() {
+        return typeOfReview;
+    }
+
+    public void setTypeOfReview(String typeOfReview) {
+        this.typeOfReview = typeOfReview;
     }
 }

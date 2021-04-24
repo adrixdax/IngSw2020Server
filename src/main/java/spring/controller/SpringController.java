@@ -294,16 +294,17 @@ public class SpringController {
     @ResponseBody
     public String review(@RequestBody String query) {
         Map<String, String> myMap = getHttpRequestMap(query);
-        if (myMap.containsKey("idFilm") && myMap.containsKey("title") && myMap.containsKey("description") && myMap.containsKey("val") && myMap.containsKey("idUser") && myMap.containsKey("insert") && myMap.get("insert").equals("true")) {
+        if (myMap.containsKey("idRecordRef") && myMap.containsKey("title") && myMap.containsKey("description") && myMap.containsKey("val") && myMap.containsKey("idUser") && myMap.containsKey("insert") && myMap.get("insert").equals("true")) {
             try {
                 checkConnection();
                 reviews rew = new reviews();
                 rew.setSql_connection(conn);
                 rew.setTitle(myMap.get("title"));
-                rew.setDescription(myMap.get("description"));
-                rew.setIdFilm(Integer.parseInt(myMap.get("idFilm")));
+                rew.setDescription(myMap.getOrDefault("description",""));
+                rew.setIdRecordRef(Integer.parseInt(myMap.get("idRecordRef")));
                 rew.setIduser(myMap.get("idUser"));
                 rew.setVal(Double.parseDouble(myMap.get("val")));
+                rew.setTypeOfReview(myMap.get("typeOfReview"));
                 rew.addRecord();
 
             } catch (Exception e) {
@@ -315,10 +316,10 @@ public class SpringController {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        if (myMap.containsKey("idFilm") && myMap.containsKey("insert") && myMap.get("insert").equals("false")) {
-            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "idFilm=" + myMap.get("idFilm")), reviews.class.getCanonicalName());
+        if (myMap.containsKey("idRecordRef") && myMap.containsKey("insert") && myMap.get("insert").equals("false")) {
+            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "idRecordRef=" + myMap.get("idRecordRef")), reviews.class.getCanonicalName());
         } else if (myMap.containsKey("idUser") && myMap.containsKey("insert") && myMap.get("insert").equals("false")) {
-            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "iduser='" + myMap.get("idUser") + "'"), reviews.class.getCanonicalName());
+            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "iduser='" + myMap.get("idUser") + "' and TypeOfReview='"+myMap.get("typeOfReview")+"'"), reviews.class.getCanonicalName());
         }
         return "";
     }
