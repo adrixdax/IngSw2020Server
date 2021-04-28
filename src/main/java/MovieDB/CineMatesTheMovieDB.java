@@ -4,7 +4,6 @@ import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.TmdbMovies;
 import info.movito.themoviedbapi.TmdbSearch;
 import info.movito.themoviedbapi.model.MovieDb;
-import info.movito.themoviedbapi.model.core.MovieResultsPage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +21,11 @@ public class CineMatesTheMovieDB {
     public static List<MovieDb> searchFilmByName(String filmName, int searchYear, boolean adultEnable) {
         if (filmName.length() > 0) {
             List<MovieDb> films = new ArrayList<>();
-                MovieResultsPage newmovies = generalSearchService.searchMovie(filmName, searchYear, "it", adultEnable, 0);
-                if (newmovies.getTotalResults() > 0) {
-                    films.addAll(newmovies.getResults());
+                ArrayList<MovieDb> newmovies = (ArrayList<MovieDb>) generalSearchService.searchMovie(filmName, searchYear, "it", adultEnable, 0).getResults();
+                if (newmovies.size() > 0) {
+                    for (MovieDb newmovie : newmovies) {
+                        films.add(searchFilmById(newmovie.getId()));
+                    }
                 }
             return films;
         }
@@ -46,8 +47,9 @@ public class CineMatesTheMovieDB {
 
     public static List<MovieDb> comingSoon(){
         ArrayList<MovieDb> list = new ArrayList<>();
+        ArrayList<MovieDb> result = (ArrayList<MovieDb>) singleMovieSearch.getUpcoming("it",0,"").getResults();
         for (int i=0; i<10; i++){
-            list.add(singleMovieSearch.getUpcoming("it",0,"").getResults().get(i));
+            list.add(searchFilmById(result.get(i).getId()));
         }
         return list;
     }
