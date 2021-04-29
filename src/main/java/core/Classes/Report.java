@@ -4,26 +4,25 @@ import core.sql.FactoryRecord;
 import core.sql.MySQLRecord;
 import core.sql.MySqlAnnotation;
 import utility.MySQLUtility;
+import utility.ReportType;
 
 public class Report extends MySQLRecord {
     @MySqlAnnotation(type = MySQLUtility.type_int)
-    int id_segnalazione;
+    int idReport=0;
     @MySqlAnnotation(type = MySQLUtility.type_string)
-    String id_user;
+    String id_user="";
     @MySqlAnnotation(type = MySQLUtility.type_int)
-    int id_recordRef;
+    int id_recordRef=0;
+    @MySqlAnnotation(type = MySQLUtility.type_string)
+    private String reportType ="";
 
-    @Override
-    public void afterRecordInsert(){
-        this.id_segnalazione = ((Report) FactoryRecord.getNewIstance(getSql_connection()).getSingleRecord(getSql_connection(),this.getClass(),"where id_user="+this.id_user+" and id_recordRef="+this.id_recordRef)).getId_segnalazione();
+
+    public int getIdReport() {
+        return idReport;
     }
 
-    public int getId_segnalazione() {
-        return id_segnalazione;
-    }
-
-    public void setId_segnalazione(int id_segnalazione) {
-        this.id_segnalazione = id_segnalazione;
+    public void setIdReport(int idReport) {
+        this.idReport = idReport;
     }
 
     public String getId_user() {
@@ -40,5 +39,13 @@ public class Report extends MySQLRecord {
 
     public void setId_recordRef(int id_recordRef) {
         this.id_recordRef = id_recordRef;
+    }
+
+    public String getReportType() {
+        return reportType;
+    }
+
+    public void setReportType(String reportType) {
+        this.reportType = reportType;
     }
 }

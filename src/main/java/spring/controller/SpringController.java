@@ -573,37 +573,24 @@ public class SpringController {
     public String report(@RequestBody String query){
         Map<String,String> map = getHttpRequestMap(query);
         try {
-            if (checkConnection()) {
-                Report report = new Report();
-                report.setId_user(map.get("idUser"));
-                report.setId_recordRef(Integer.parseInt(map.get("id_recordRef")));
-                report.addRecord();
-                List<ReportList> list = new ArrayList<>();
-                if (map.containsKey("linguaggio offensivo")) {
-                    list.add(new ReportList(report.getId_segnalazione(), ReportType.LIGUAGGIO_OFFENSIVO));
-                }
-                if (map.containsKey("discriminazione")) {
-                    list.add(new ReportList(report.getId_segnalazione(), ReportType.DISCRIMINAZIONE));
-                }
-                if (map.containsKey("incitazione allo odio")) {
-                    list.add(new ReportList(report.getId_segnalazione(), ReportType.INCITAZIONE_ALLO_ODIO));
-                }
-                if (map.containsKey("blasfemia")) {
-                    list.add(new ReportList(report.getId_segnalazione(), ReportType.BLASFEMIA));
-                }
-                if (map.containsKey("recensione priva di senso")) {
-                    list.add(new ReportList(report.getId_segnalazione(), ReportType.RECENSIONE_PRIVA_DI_SENSO));
-                }
-                if (map.containsKey("spam")) {
-                    list.add(new ReportList(report.getId_segnalazione(), ReportType.SPAM));
-                }
-                for (ReportList r : list) {
-                    r.addRecord();
-                }
-                return "Grazie della segnalazione";
-            }
+            checkConnection();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+        }
+        if (map.containsKey("addReport") && map.get("addReport").equals("true")) {
+            try {
+                if (checkConnection()) {
+                    Report report = new Report();
+                    report.setId_user(map.get("idUser"));
+                    report.setId_recordRef(Integer.parseInt(map.get("id_recordRef")));
+                    report.setReportType(map.get("reportType"));
+                    report.addRecord();
+
+                    return "Grazie della segnalazione";
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         }
         return "";
     }
