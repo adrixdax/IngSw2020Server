@@ -581,11 +581,12 @@ public class SpringController {
             try {
                 if (checkConnection()) {
                     Report report = new Report();
+                    report.setSql_connection(this.conn);
                     report.setId_user(map.get("idUser"));
                     report.setId_recordRef(Integer.parseInt(map.get("id_recordRef")));
                     report.setReportType(map.get("reportType"));
                     report.addRecord();
-
+                    System.out.println(report.getId_user()+" "+report.getId_recordRef()+" "+report.getReportType());
                     return "Grazie della segnalazione";
                 }
             } catch (SQLException throwables) {
