@@ -43,7 +43,7 @@ public class JSONCreation {
                 }
                 default: {
                     try {
-                        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationDB.getJsonDB(instance, mapper, ClassToConvert));
+                        return "["+mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationDB.getJsonDB(instance, mapper, ClassToConvert))+"]";
                     } catch (JsonProcessingException | ClassNotFoundException e) {
                         e.printStackTrace();
                     }

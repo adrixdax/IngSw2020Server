@@ -98,15 +98,20 @@ public class SpringController {
         } else if (myMap.containsKey("addFriends") && myMap.get("addFriends").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idOtherUser")) {
             Contact contact = (Contact) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Contact.class, "where (user1 ='" + myMap.get("idUser") + "' And user2 ='" + myMap.get("idOtherUser") + "') " +
                     "OR (user1 = '" + myMap.get("idOtherUser") + "' AND user2 ='" + myMap.get("idUser") + "' )");
+            Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Notify.class, "where (id_sender='" + myMap.get("idUser") + "' and id_receiver='" + myMap.get("idOtherUser") + "') or (id_sender='" + myMap.get("idOtherUser") + "' and id_receiver='" + myMap.get("idUser") + "')");
             if (contact == null) {
-                Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Notify.class, "where (id_sender='" + myMap.get("idUser") + "' and id_receiver='" + myMap.get("idOtherUser") + "') or (id_sender='" + myMap.get("idOtherUser") + "' and id_receiver='" + myMap.get("idUser") + "')");
                 not.setState(NotifyStatusType.ACCEPTED.toString());
+                not.setSql_connection(conn);
+                not.updateRecord();
                 contact = new Contact();
                 contact.setUser1(myMap.get("idUser"));
                 contact.setUser2(myMap.get("idOtherUser"));
                 contact.setSql_connection(conn);
                 contact.addRecord();
             } else {
+                not.setState(NotifyStatusType.ACCEPTED.toString());
+                not.setSql_connection(conn);
+                not.updateRecord();
                 return "Utenti già Amici";
             }
         } else if (myMap.containsKey("isFriends") && myMap.get("isFriends").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idOtherUser")) {
@@ -327,10 +332,10 @@ public class SpringController {
     @GetMapping(value = "/review")
     @ResponseBody
     public String review(@RequestParam Map<String, String> query) {
-        if (query.containsKey("idReview")) {
+        if (query.containsKey("id_review")) {
             try {
                 checkConnection();
-                return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getSingleRecord(conn, reviews.class, "id_review=" + query.get("idReview")), reviews.class.getCanonicalName());
+                return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getSingleRecord(conn, reviews.class, "id_review=" + query.get("id_review")), reviews.class.getCanonicalName());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -355,6 +360,67 @@ public class SpringController {
             System.out.println(json);
             return json;
         }
+    }
+
+    @PostMapping(value="/notify")
+    @ResponseBody
+    public String newNotify(@RequestBody String param){
+        Map<String, String> query = getHttpRequestMap(param);
+        try {
+            checkConnection();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        if (query.containsKey("id_sender") && query.containsKey("id_receiver") && query.containsKey("type") && query.containsKey("sendNotify") && query.get("sendNotify").equals("true")) {
+            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Rome"), Locale.ITALY);
+            Calendar cal2 = Calendar.getInstance(TimeZone.getTimeZone("Europe/Rome"), Locale.ITALY);
+            List<AbstractSQLRecord> sql = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Notify.class,
+                    "where id_receiver='" + query.get("id_receiver") +
+                            "' and id_sender='" + query.get("id_sender") +
+                            "' and type='" + query.get("type") +
+                            "' and id_recordref='" + (Integer.parseInt(query.get("id_recordref").isEmpty() ? "0" : query.get("id_recordref"))) +
+                            "' order by  dateOfSend DESC");
+
+            Notify not = new Notify();
+            for (AbstractSQLRecord record : sql) {
+                Notify tmp = (Notify) record;
+                if(tmp!=null){
+                    if(not.getDateOfSend()< tmp.getDateOfSend()){
+                        not=tmp;
+                    }
+                }else{
+                    not=tmp;
+                }
+            }
+            cal2.setTimeInMillis(not.getDateOfSend());
+            cal2.add(Calendar.WEEK_OF_YEAR, 1);
+            if (cal2.getTimeInMillis() < cal.getTimeInMillis()) {
+                not = new Notify();
+                not.setSql_connection(conn);
+                not.setId_receiver(query.get("id_receiver"));
+                not.setId_sender(query.get("id_sender"));
+                not.setType(String.valueOf(query.get("type")));
+                not.setId_recordref(Integer.parseInt(query.get("id_recordref").isEmpty() ? "0" : query.get("id_recordref")));
+                not.setState(NotifyStatusType.PENDING.toString());
+                not.setDateOfSend(cal.getTimeInMillis());
+                not.addRecord();
+
+                return "Notifica inviata con successo";
+
+            } else if (not.getType().equals("LIST")) {
+                not = new Notify();
+                not.setSql_connection(conn);
+                not.setId_receiver(query.get("id_receiver"));
+                not.setId_sender(query.get("id_sender"));
+                not.setType(String.valueOf(query.get("type")));
+                not.setId_recordref(Integer.parseInt(query.get("id_recordref").isEmpty() ? "0" : query.get("id_recordref")));
+                not.setState(NotifyStatusType.PENDING.toString());
+                not.setDateOfSend(cal.getTimeInMillis());
+                not.addRecord();
+            }
+            return "Content Shared";
+        }
+        return "";
     }
 
     @GetMapping(value = "/notify")
@@ -410,8 +476,9 @@ public class SpringController {
                     break;
                 }
                 case "FILM": {
-                    UserList toWatchList = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "where idUser='" + not.getId_receiver() + "' and type='TOWATCH");
+                    UserList toWatchList = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "where idUser='" + not.getId_receiver() + "' and type='TOWATCH'");
                     filminlist film = new filminlist();
+                    film.setSql_connection(conn);
                     film.setIdList(toWatchList.getIdUserList());
                     film.setIdFilm(not.getId_recordref());
                     film.addRecord();
@@ -425,61 +492,7 @@ public class SpringController {
             not.setState(NotifyStatusType.REFUSED.toString());
             not.updateRecord();
             return "Status Changed";
-        } else if (query.containsKey("id_sender") && query.containsKey("id_receiver") && query.containsKey("type") && query.containsKey("sendNotify") && query.get("sendNotify").equals("true")) {
-
-            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Rome"), Locale.ITALY);
-            Calendar cal2 = Calendar.getInstance(TimeZone.getTimeZone("Europe/Rome"), Locale.ITALY);
-
-
-            List<AbstractSQLRecord> sql = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Notify.class,
-                    "where id_receiver='" + query.get("id_receiver") +
-                            "' and id_sender='" + query.get("id_sender") +
-                            "' and type='" + query.get("type") +
-                            "' and id_recordref='" + (Integer.parseInt(query.get("id_recordref").isEmpty() ? "0" : query.get("id_recordref"))) +
-                            "' order by  dateOfSend DESC");
-
-            Notify not = new Notify();
-            for (AbstractSQLRecord record : sql) {
-                Notify tmp = (Notify) record;
-                if(tmp!=null){
-                    if(not.getDateOfSend()< tmp.getDateOfSend()){
-                        not=tmp;
-                    }
-                }else{
-                    not=tmp;
-                }
-            }
-
-                cal2.setTimeInMillis(not.getDateOfSend());
-                cal2.add(Calendar.WEEK_OF_YEAR, 1);
-                if (cal2.getTimeInMillis() < cal.getTimeInMillis()) {
-                        not = new Notify();
-                        not.setSql_connection(conn);
-                        not.setId_receiver(query.get("id_receiver"));
-                        not.setId_sender(query.get("id_sender"));
-                        not.setType(String.valueOf(query.get("type")));
-                        not.setId_recordref(Integer.parseInt(query.get("id_recordref").isEmpty() ? "0" : query.get("id_recordref")));
-                        not.setState(NotifyStatusType.PENDING.toString());
-                        not.setDateOfSend(cal.getTimeInMillis());
-                        not.addRecord();
-
-                        return "Notifica inviata con successo";
-
-                    } else if (not.getType().equals("LIST")) {
-                        not = new Notify();
-                        not.setSql_connection(conn);
-                        not.setId_receiver(query.get("id_receiver"));
-                        not.setId_sender(query.get("id_sender"));
-                        not.setType(String.valueOf(query.get("type")));
-                        not.setId_recordref(Integer.parseInt(query.get("id_recordref").isEmpty() ? "0" : query.get("id_recordref")));
-                        not.setState(NotifyStatusType.PENDING.toString());
-                        not.setDateOfSend(cal.getTimeInMillis());
-                        not.addRecord();
-                    }
-
-                }
-
-
+        }
         return "[]";
     }
 
