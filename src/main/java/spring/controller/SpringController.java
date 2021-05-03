@@ -427,6 +427,16 @@ public class SpringController {
                 return JSONCreation.getJSONToCreate(list, Notify.class.getCanonicalName());
             } else
                 return "[]";
+        } else if (query.containsKey("friendId")){
+            List<AbstractSQLRecord> rec = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Notify.class, "id_receiver='" + query.get("friendId") + "' and (state = 'PENDING' OR state = 'SEEN') and type='FRIENDSHIP_REQUEST' order by state asc");
+            rec.addAll(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Notify.class, "id_sender='" + query.get("friendId") + "' and (state = 'PENDING' OR state = 'SEEN') and type='FRIENDSHIP_REQUEST' order by state asc"));
+            if (rec.size() > 0) {
+                for (AbstractSQLRecord record : rec) {
+                    list.add((Notify) record);
+                }
+                return JSONCreation.getJSONToCreate(list, Notify.class.getCanonicalName());
+            }
+        else return "[]";
         } else if (query.containsKey("Seen")) {
             Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Notify.class, "id_Notify=" + query.get("Seen"));
             not.setSql_connection(conn);
