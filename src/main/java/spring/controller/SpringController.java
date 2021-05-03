@@ -158,9 +158,7 @@ public class SpringController {
                     list.setTitle("Visti");
                     list.setType(UserListType.WATCH.toString());
                     list.addRecord();
-
                     return "Registrazione avvenuta con successo";
-
                 }
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
@@ -168,10 +166,7 @@ public class SpringController {
         } else if (myMap.containsKey("google")) {
             try {
                 if (checkConnection()) {
-
                     UserList list = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "where idUser='" + myMap.get("google") + "' and type='PREFERED'");
-
-
                     if (list == null) {
                         list = new UserList();
                         list.setIdUser(myMap.get("google"));
@@ -181,9 +176,7 @@ public class SpringController {
                         list.setType(UserListType.PREFERED.toString());
                         list.addRecord();
                     }
-
                     list = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "where idUser='" + myMap.get("google") + "' and type='TOWATCH'");
-
                     if (list == null) {
                         list = new UserList();
                         list.setIdUser(myMap.get("google"));
@@ -193,9 +186,7 @@ public class SpringController {
                         list.setType(UserListType.TOWATCH.toString());
                         list.addRecord();
                     }
-
                     list = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "where idUser='" + myMap.get("google") + "' and type='WATCH'");
-
                     if (list == null) {
                         list = new UserList();
                         list.setIdUser(myMap.get("google"));
@@ -205,18 +196,14 @@ public class SpringController {
                         list.setType(UserListType.WATCH.toString());
                         list.addRecord();
                     }
-
                     return "Registrazione avvenuta con successo";
                 } else {
                     return "Sono già presenti le liste personalizzate per questo utente";
                 }
-
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
-
         }
-
         return "";
     }
 
@@ -404,7 +391,6 @@ public class SpringController {
                 not.setState(NotifyStatusType.PENDING.toString());
                 not.setDateOfSend(cal.getTimeInMillis());
                 not.addRecord();
-
                 return "Notifica inviata con successo";
 
             } else if (not.getType().equals("LIST")) {
@@ -469,6 +455,7 @@ public class SpringController {
                     List<AbstractSQLRecord> listaDiFilm = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, filminlist.class, "idList=" + not.getId_recordref());
                     for (AbstractSQLRecord film : listaDiFilm) {
                         filminlist nuovoFilm = new filminlist();
+                        nuovoFilm.setSql_connection(conn);
                         nuovoFilm.setIdFilm(((filminlist) (film)).getIdFilm());
                         nuovoFilm.setIdList(nuovaLista.getIdUserList());
                         nuovoFilm.addRecord();
@@ -477,11 +464,14 @@ public class SpringController {
                 }
                 case "FILM": {
                     UserList toWatchList = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "where idUser='" + not.getId_receiver() + "' and type='TOWATCH'");
-                    filminlist film = new filminlist();
-                    film.setSql_connection(conn);
-                    film.setIdList(toWatchList.getIdUserList());
-                    film.setIdFilm(not.getId_recordref());
-                    film.addRecord();
+                    filminlist isAlreadyInList = (filminlist) FactoryRecord.getNewIstance(conn).getSingleRecord(conn,filminlist.class,"where idFilm="+not.getId_recordref()+" and idList="+toWatchList.getIdUserList());
+                    if (isAlreadyInList == null) {
+                        filminlist film = new filminlist();
+                        film.setSql_connection(conn);
+                        film.setIdList(toWatchList.getIdUserList());
+                        film.setIdFilm(not.getId_recordref());
+                        film.addRecord();
+                    }
                     break;
                 }
             }
