@@ -1,10 +1,16 @@
 package core.Classes;
 
+import core.cnntodb.ConnectionToMySQL;
+import core.sql.AbstractSQLRecord;
 import core.sql.FactoryRecord;
 import core.sql.MySQLRecord;
 import core.sql.MySqlAnnotation;
 import utility.MySQLUtility;
 import utility.ReportType;
+
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Report extends MySQLRecord {
     @MySqlAnnotation(type = MySQLUtility.type_int)
@@ -47,5 +53,26 @@ public class Report extends MySQLRecord {
 
     public void setReportType(String reportType) {
         this.reportType = reportType;
+    }
+
+    @Override
+    public void afterRecordInsert() {
+        try {
+            List<AbstractSQLRecord> findReport = FactoryRecord.getNewIstance(getSql_connection())
+                    .getListOfRecord(getSql_connection(), Report.class, "where id_recordRef='"
+                            + id_recordRef + "' and id_user='" + id_user + "'");
+
+            if (findReport != null) {
+                if (findReport.size() >= 3) {
+                    reviews findReview = (reviews) FactoryRecord.getNewIstance(getSql_connection())
+                            .getSingleRecord(getSql_connection(), reviews.class, "where id_reviews='" + id_recordRef + "'");
+                    findReview.setObscured(true);
+                    findReview.setSql_connection(getSql_connection());
+                    findReview.updateRecord();
+                }
+            }
+        }catch (Exception ex){
+            Logger.getLogger(ConnectionToMySQL.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

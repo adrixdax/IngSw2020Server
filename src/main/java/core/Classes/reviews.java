@@ -6,7 +6,7 @@ import utility.MySQLUtility;
 
 public class reviews extends MySQLRecord {
     @MySqlAnnotation(type = MySQLUtility.type_int)
-    private int id_review;
+    private int id_reviews;
     @MySqlAnnotation(type = MySQLUtility.type_string)
     private String title;
     @MySqlAnnotation(type = MySQLUtility.type_string)
@@ -19,13 +19,17 @@ public class reviews extends MySQLRecord {
     private String iduser;
     @MySqlAnnotation(type = MySQLUtility.type_string)
     private String typeOfReview;
+    @MySqlAnnotation(type = MySQLUtility.type_bool)
+    private boolean obscured = false;
 
-    public int getId_review() {
-        return id_review;
+
+
+    public int getId_reviews() {
+        return id_reviews;
     }
 
-    public void setId_review(int id_review) {
-        this.id_review = id_review;
+    public void setId_reviews(int id_reviews) {
+        this.id_reviews = id_reviews;
     }
 
     public String getTitle() {
@@ -74,5 +78,17 @@ public class reviews extends MySQLRecord {
 
     public void setTypeOfReview(String typeOfReview) {
         this.typeOfReview = typeOfReview;
+    }
+
+    public boolean isObscured() {
+        return obscured;
+    }
+
+    public boolean getObscured() {
+        return obscured;
+    }
+
+    public void setObscured(boolean obscured) {
+        this.obscured = obscured;
     }
 }

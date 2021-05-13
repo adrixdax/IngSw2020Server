@@ -146,13 +146,15 @@ public class MySQLUtility {
                 for (MySQLRecord mySQLField : fieldToUpdate) {
                     if (mySQLField.getColum_name().equals("id_" + c.getSimpleName())) {
                         whereField = "WHERE " + mySQLField.getColum_name() + " ='" + mySQLField.getCurretValue() + "'";
+                    }else {
+                        sqlUpdate = sqlUpdate + mySQLField.getUpdateCommand() + " ,";
                     }
-                    sqlUpdate = sqlUpdate + mySQLField.getUpdateCommand() + " ,";
                 }
 
                 sqlUpdate = sqlUpdate.substring(0, sqlUpdate.length() - 1) + whereField;
                 Statement st = this.getCnn().createStatement();
-                st.execute(sqlUpdate);
+                System.out.println("\n\n"+sqlUpdate+"\n\n");
+                st.execute(sqlUpdate+";");
                 st.close();
             }
         } catch (SQLException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {

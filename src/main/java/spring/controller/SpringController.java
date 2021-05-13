@@ -299,6 +299,24 @@ public class SpringController {
                 rew.setTypeOfReview(myMap.get("typeOfReview"));
                 rew.addRecord();
 
+                if(myMap.get("typeOfReview").equals("LIST")){
+
+                    UserList user = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class,"where idUserList='"+myMap.get("idRecordRef")+"'");
+                    if(user!=null) {
+                        System.out.println("Utente" + user.getIdUser());
+                        Notify notify = new Notify();
+                        notify.setSql_connection(conn);
+                        notify.setId_recordref(Integer.parseInt(myMap.get("idRecordRef")));
+                        notify.setId_sender(myMap.get("idUser"));
+                        notify.setId_receiver(user.getIdUser());
+                        notify.setDateOfSend(System.currentTimeMillis());
+                        notify.setType("LIST_REVIEW");
+                        notify.setState(NotifyStatusType.PENDING.toString());
+                        notify.addRecord();
+
+                    }
+                }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -309,9 +327,9 @@ public class SpringController {
             throwables.printStackTrace();
         }
         if (myMap.containsKey("idRecordRef") && myMap.containsKey("insert") && myMap.get("insert").equals("false")) {
-            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "idRecordRef=" + myMap.get("idRecordRef")), reviews.class.getCanonicalName());
+            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "idRecordRef=" + myMap.get("idRecordRef") +" and obscured=false"), reviews.class.getCanonicalName());
         } else if (myMap.containsKey("idUser") && myMap.containsKey("insert") && myMap.get("insert").equals("false")) {
-            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "iduser='" + myMap.get("idUser") + "' and TypeOfReview='"+myMap.get("typeOfReview")+"'"), reviews.class.getCanonicalName());
+            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "iduser='" + myMap.get("idUser") + "' and TypeOfReview='"+myMap.get("typeOfReview")+"' and obscured=false"), reviews.class.getCanonicalName());
         }
         return "";
     }
@@ -322,7 +340,7 @@ public class SpringController {
         if (query.containsKey("id_review")) {
             try {
                 checkConnection();
-                return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getSingleRecord(conn, reviews.class, "id_review=" + query.get("id_review")), reviews.class.getCanonicalName());
+                return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getSingleRecord(conn, reviews.class, "id_reviews=" + query.get("id_review")), reviews.class.getCanonicalName());
             } catch (Exception e) {
                 e.printStackTrace();
             }
