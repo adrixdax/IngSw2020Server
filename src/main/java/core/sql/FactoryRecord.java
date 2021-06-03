@@ -68,7 +68,7 @@ public class FactoryRecord {
             rs.close();
             st.close();
 
-        } catch (SQLException | InstantiationException | IllegalAccessException ex) {
+        } catch (SQLException | IllegalAccessException | InstantiationException ex) {
             Logger.getLogger(FactoryRecord.class.getName()).log(Level.SEVERE, null, ex);
         }
 

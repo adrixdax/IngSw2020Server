@@ -52,7 +52,7 @@ public class DbConnectionForBackEnd {
     public boolean createConnection() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            String linkToDb = "jdbc:mysql://87.19.174.241:3306";
+            String linkToDb = "jdbc:mysql://79.53.0.149:3306";
             con = DriverManager.getConnection(linkToDb, user, pw);
             String command = "use "+schema;
             PreparedStatement st = con.prepareStatement(command);

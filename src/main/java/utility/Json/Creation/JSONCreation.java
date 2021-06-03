@@ -31,7 +31,7 @@ public class JSONCreation {
         if (instance != null) {
             switch (instance.getClass().getSimpleName()) {
                 case "MovieDb":
-                case "MovieDbExtende":{
+                case "MovieDbExtended":{
                     try {
                         return "["+mapper.writerWithDefaultPrettyPrinter().writeValueAsString(JSONCreationMovieDb.getJsonFilmInfo((MovieDb) instance, mapper))+"]";
                     } catch (Exception ex) {

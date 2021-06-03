@@ -34,7 +34,7 @@ public class SpringController {
     }
 
     private boolean checkConnection() throws SQLException {
-        if (conn.isClosed() || conn == null) {
+        if (conn == null || conn.isClosed()) {
             this.conn = new DbConnectionForBackEnd().getConnection();
         }
         return true;
