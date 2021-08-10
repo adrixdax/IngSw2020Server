@@ -298,15 +298,13 @@ public class SpringController {
                 rew.setVal(Double.parseDouble(myMap.get("val")));
                 rew.setTypeOfReview(myMap.get("typeOfReview"));
                 rew.addRecord();
-
                 if(myMap.get("typeOfReview").equals("LIST")){
 
                     UserList user = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class,"where idUserList='"+myMap.get("idRecordRef")+"'");
                     if(user!=null) {
-                        System.out.println("Utente" + user.getIdUser());
                         Notify notify = new Notify();
                         notify.setSql_connection(conn);
-                        notify.setId_recordref(Integer.parseInt(myMap.get("idRecordRef")));
+                        notify.setId_recordref(rew.getId_reviews());
                         notify.setId_sender(myMap.get("idUser"));
                         notify.setId_receiver(user.getIdUser());
                         notify.setDateOfSend(System.currentTimeMillis());
@@ -360,10 +358,7 @@ public class SpringController {
             return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, UserList.class, "idUser=" + query.get("idUser")), UserList.class.getCanonicalName());
         else {
             UserList u = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "idUserList='" + query.get("idUserList") + "'");
-            System.out.println(u.getTitle());
-            String json = JSONCreation.getJSONToCreate(u, UserList.class.getCanonicalName());
-            System.out.println(json);
-            return json;
+            return JSONCreation.getJSONToCreate(u, UserList.class.getCanonicalName());
         }
     }
 
@@ -617,7 +612,6 @@ public class SpringController {
                     report.setId_recordRef(Integer.parseInt(map.get("id_recordRef")));
                     report.setReportType(map.get("reportType"));
                     report.addRecord();
-                    System.out.println(report.getId_user()+" "+report.getId_recordRef()+" "+report.getReportType());
                     return "Grazie della segnalazione";
                 }
             } catch (SQLException throwables) {

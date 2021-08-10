@@ -1,5 +1,6 @@
 package core.Classes;
 
+import core.sql.FactoryRecord;
 import core.sql.MySQLRecord;
 import core.sql.MySqlAnnotation;
 import utility.MySQLUtility;
@@ -90,5 +91,9 @@ public class reviews extends MySQLRecord {
 
     public void setObscured(boolean obscured) {
         this.obscured = obscured;
+    }
+    @Override
+    public void afterRecordInsert(){
+        this.id_reviews = ((reviews) FactoryRecord.getNewIstance(getSql_connection()).getSingleRecord(getSql_connection(),this.getClass(),"where iduser='"+this.iduser+"' and idRecordRef='"+this.idRecordRef+"' ORDER BY id_reviews DESC")).getId_reviews();
     }
 }
