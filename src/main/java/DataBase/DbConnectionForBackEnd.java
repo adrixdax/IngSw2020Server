@@ -49,16 +49,21 @@ public class DbConnectionForBackEnd {
         }
     }
 
-    public boolean createConnection() {
+    public void createConnection() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
+            java.util.Properties connProperties = new java.util.Properties();
+            connProperties.put("user", user);
+            connProperties.put("password", pw);
+            connProperties.put("autoReconnect", "true");
+            connProperties.put("maxReconnects", "4");
             String linkToDb = "jdbc:mysql://cinematesdevelopment.duckdns.org:3306?connectTimeout=0&socketTimeout=0&autoReconnect=true";
-            con = DriverManager.getConnection(linkToDb, user, pw);
+            con = DriverManager.getConnection(linkToDb, connProperties);
             String command = "use "+schema;
             PreparedStatement st = con.prepareStatement(command);
-            return st.execute(command);
+            st.execute(command);
         } catch (Exception ex) {
-            return false;
+            ex.printStackTrace();
         }
     }
 
