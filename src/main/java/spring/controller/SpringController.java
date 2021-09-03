@@ -14,7 +14,6 @@ import utility.Json.Creation.JSONCreation;
 import utility.Json.Decode.JSONDecoder;
 import utility.Json.Requests.HTTPRequest;
 import utility.NotifyStatusType;
-import utility.ReportType;
 import utility.UserListType;
 
 import java.sql.Connection;
@@ -27,15 +26,26 @@ import static MovieDB.CineMatesTheMovieDB.searchFilmByName;
 @RestController
 public class SpringController {
 
-    Connection conn;
+    private static Connection conn;
+    private int onlineMembers=0;
 
     public SpringController() {
-        this.conn = new DbConnectionForBackEnd().getConnection();
+        conn = new DbConnectionForBackEnd().getConnection();
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(25200000);
+                    FactoryRecord.getNewIstance(conn).getSingleRecord(conn, MostViewed.class, "");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     private boolean checkConnection() throws SQLException {
         if (conn == null || conn.isClosed()) {
-            this.conn = new DbConnectionForBackEnd().getConnection();
+            conn = new DbConnectionForBackEnd().getConnection();
         }
         return true;
     }
@@ -624,6 +634,18 @@ public class SpringController {
     @GetMapping(value = "/report")
     public String report(@RequestParam Map<String, String> query){
         return "";
+    }
+
+    @GetMapping(value = "/online")
+    public String onlineUsers(@RequestParam Map<String, Boolean> query) {
+        if (query.containsKey("getOnlineUsers")) {
+            return String.valueOf(onlineMembers);
+        }
+        if (query.get("newUser").equals("true"))
+            onlineMembers++;
+        else
+            onlineMembers--;
+        return "Ok";
     }
 
 }

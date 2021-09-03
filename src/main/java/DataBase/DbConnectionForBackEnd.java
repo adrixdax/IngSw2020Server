@@ -55,9 +55,12 @@ public class DbConnectionForBackEnd {
             java.util.Properties connProperties = new java.util.Properties();
             connProperties.put("user", user);
             connProperties.put("password", pw);
-            connProperties.put("autoReconnect", "true");
             connProperties.put("maxReconnects", "4");
-            String linkToDb = "jdbc:mysql://cinematesdevelopment.duckdns.org:3306?connectTimeout=0&socketTimeout=0&autoReconnect=true";
+            connProperties.put("connectTimeout","0");
+            connProperties.put("socketTimeout","0");
+            connProperties.put("autoReconnect", "true");
+            System.out.println(connProperties);
+            String linkToDb = "jdbc:mysql://cinematesdevelopment.duckdns.org:3306";
             con = DriverManager.getConnection(linkToDb, connProperties);
             String command = "use "+schema;
             PreparedStatement st = con.prepareStatement(command);
