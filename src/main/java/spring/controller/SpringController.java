@@ -638,14 +638,22 @@ public class SpringController {
 
     @GetMapping(value = "/online")
     public String onlineUsers(@RequestParam Map<String, Boolean> query) {
+        if (query.containsKey("loggingIn")) {
+            if (Boolean.parseBoolean(String.valueOf(query.get("loggingIn"))))
+                onlineMembers++;
+            else {
+                if (onlineMembers <= 0) {
+                    onlineMembers = 0;
+                } else {
+                    onlineMembers--;
+                }
+            }
+            return "Ok";
+        }
         if (query.containsKey("getOnlineUsers")) {
             return String.valueOf(onlineMembers);
         }
-        if (query.get("newUser").equals("true"))
-            onlineMembers++;
-        else
-            onlineMembers--;
-        return "Ok";
+        return "error";
     }
 
 }
