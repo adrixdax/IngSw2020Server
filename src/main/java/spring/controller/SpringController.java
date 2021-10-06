@@ -632,8 +632,19 @@ public class SpringController {
     }
 
     @GetMapping(value = "/report")
-    public String report(@RequestParam Map<String, String> query){
-        return "";
+    public String report(@RequestParam Map<String, Boolean> query){
+        try {
+            checkConnection();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }if(query.get("getReports")){
+            try{
+                return  JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn,Report.class, ""), Report.class.getSimpleName());
+            } catch (Exception throwables) {
+                throwables.printStackTrace();
+            }
+        }
+
     }
 
     @GetMapping(value = "/online")
