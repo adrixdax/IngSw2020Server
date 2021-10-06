@@ -598,7 +598,7 @@ public class SpringController {
 
             for (AbstractSQLRecord record : sql)
                 movies.add(CineMatesTheMovieDB.searchFilmById(((filminlist) record).getIdFilm()));
-            return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
+            return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getCanonicalName());
 
         }
         return "";
@@ -632,19 +632,19 @@ public class SpringController {
     }
 
     @GetMapping(value = "/report")
-    public String report(@RequestParam Map<String, Boolean> query){
+    public String report(@RequestParam Map<String, String> query){
         try {
             checkConnection();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
-        }if(query.get("getReports")){
+        }if(Boolean.parseBoolean(query.get("getReports"))){
             try{
-                return  JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn,Report.class, ""), Report.class.getSimpleName());
+                return  JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn,Report.class, ""), Report.class.getCanonicalName());
             } catch (Exception throwables) {
                 throwables.printStackTrace();
             }
         }
-
+        return "";
     }
 
     @GetMapping(value = "/online")
