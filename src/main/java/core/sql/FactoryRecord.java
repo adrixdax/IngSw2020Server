@@ -76,6 +76,10 @@ public class FactoryRecord {
     }
 
     public List<AbstractSQLRecord> getListOfRecord(Connection cnn_sql, Class c, String whereclausule){
+        return getListOfRecord( cnn_sql,  c,  whereclausule, "");
+    }
+
+    public List<AbstractSQLRecord> getListOfRecord(Connection cnn_sql, Class c, String whereclausule, String orderBy){
 
         Connection cnn = null;
         if (cnn_sql != null) {
@@ -83,13 +87,17 @@ public class FactoryRecord {
         }
 
         AbstractSQLRecord onj = null;
-        if (!whereclausule.isEmpty()) {
+        if (!whereclausule.isEmpty()){
             whereclausule = "where " + whereclausule.replaceFirst("where", "");
+        }
+
+        if (!orderBy.isEmpty()){
+            orderBy = "order by " + orderBy.replaceFirst("order by", "");
         }
 
         List<AbstractSQLRecord> listOfRecord= new ArrayList<>();
 
-        String select = "select * from " + c.getSimpleName() + " " + whereclausule;
+        String select = "select * from " + c.getSimpleName() + " " + whereclausule + orderBy;
         System.out.println(select);
         try {
             Statement st;
