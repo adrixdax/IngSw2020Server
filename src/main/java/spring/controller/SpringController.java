@@ -299,7 +299,7 @@ public class SpringController {
         if (myMap.containsKey("idRecordRef") && myMap.containsKey("title") && myMap.containsKey("description") && myMap.containsKey("val") && myMap.containsKey("idUser") && myMap.containsKey("insert") && myMap.get("insert").equals("true")) {
             try {
                 checkConnection();
-                reviews rew = new reviews();
+                Reviews rew = new Reviews();
                 rew.setSql_connection(conn);
                 rew.setTitle(myMap.get("title"));
                 rew.setDescription(myMap.getOrDefault("description",""));
@@ -314,7 +314,7 @@ public class SpringController {
                     if(user!=null) {
                         Notify notify = new Notify();
                         notify.setSql_connection(conn);
-                        notify.setId_recordref(rew.getId_reviews());
+                        notify.setId_recordref(rew.getIdReviews());
                         notify.setId_sender(myMap.get("idUser"));
                         notify.setId_receiver(user.getIdUser());
                         notify.setDateOfSend(System.currentTimeMillis());
@@ -335,9 +335,13 @@ public class SpringController {
             throwables.printStackTrace();
         }
         if (myMap.containsKey("idRecordRef") && myMap.containsKey("insert") && myMap.get("insert").equals("false")) {
-            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "idRecordRef=" + myMap.get("idRecordRef") +" and obscured=false"), reviews.class.getCanonicalName());
+            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Reviews.class, "idRecordRef=" + myMap.get("idRecordRef") +" and obscured=false"), Reviews.class.getCanonicalName());
         } else if (myMap.containsKey("idUser") && myMap.containsKey("insert") && myMap.get("insert").equals("false")) {
-            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, reviews.class, "iduser='" + myMap.get("idUser") + "' and TypeOfReview='"+myMap.get("typeOfReview")+"' and obscured=false"), reviews.class.getCanonicalName());
+            return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Reviews.class, "iduser='" + myMap.get("idUser") + "' and TypeOfReview='"+myMap.get("typeOfReview")+"' and obscured=false"), Reviews.class.getCanonicalName());
+        } else if (myMap.containsKey("idReviews") && myMap.containsKey("delete") && myMap.get("delete").equals("true")){
+            Reviews r = (Reviews) FactoryRecord.getNewIstance(conn).getSingleRecord(conn,Reviews.class,"idReviews="+myMap.get("idReviews"));
+            r.deleteRecord();
+            return "Review deleted correctly";
         }
         return "";
     }
@@ -345,10 +349,10 @@ public class SpringController {
     @GetMapping(value = "/review")
     @ResponseBody
     public String review(@RequestParam Map<String, String> query) {
-        if (query.containsKey("id_review")) {
+        if (query.containsKey("idReviews")) {
             try {
                 checkConnection();
-                return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getSingleRecord(conn, reviews.class, "id_reviews=" + query.get("id_review")), reviews.class.getCanonicalName());
+                return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Reviews.class, "idReviews=" + query.get("idReviews")), Reviews.class.getCanonicalName());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -595,11 +599,9 @@ public class SpringController {
             }
             List<AbstractSQLRecord> sql = FactoryRecord.getNewIstance(conn).getListOfRecord(conn, filminlist.class, "idList='" + myMap.get("idList") + "'");
             List<MovieDb> movies = new ArrayList<>();
-
             for (AbstractSQLRecord record : sql)
                 movies.add(CineMatesTheMovieDB.searchFilmById(((filminlist) record).getIdFilm()));
-            return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getCanonicalName());
-
+            return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
         }
         return "";
     }
@@ -617,7 +619,7 @@ public class SpringController {
             try {
                 if (checkConnection()) {
                     Report report = new Report();
-                    report.setSql_connection(this.conn);
+                    report.setSql_connection(conn);
                     report.setId_user(map.get("idUser"));
                     report.setId_recordRef(Integer.parseInt(map.get("id_recordRef")));
                     report.setReportType(map.get("reportType"));
@@ -627,6 +629,14 @@ public class SpringController {
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
+        }
+        if (map.containsKey("visible") && map.get("visible").equals("true")){
+            Report r = (Report) FactoryRecord.getNewIstance(conn).getSingleRecord(conn,Report.class,"idReport="+map.get("idReport"));
+            Reviews rv = (Reviews) FactoryRecord.getNewIstance(conn).getSingleRecord(conn,Reviews.class,"idReviews="+r.getId_recordRef());
+            rv.setObscured(false);
+            rv.updateRecord();
+            r.deleteRecord();
+            return "content updated";
         }
         return "";
     }
@@ -639,7 +649,7 @@ public class SpringController {
             throwables.printStackTrace();
         }if(Boolean.parseBoolean(query.get("getReports"))){
             try{
-                return  JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn,Report.class, ""), Report.class.getCanonicalName());
+                return  JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn,Report.class, "","id_recordRef asc"), Report.class.getCanonicalName());
             } catch (Exception throwables) {
                 throwables.printStackTrace();
             }

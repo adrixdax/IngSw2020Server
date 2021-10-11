@@ -60,12 +60,12 @@ public class Report extends MySQLRecord {
         try {
             List<AbstractSQLRecord> findReport = FactoryRecord.getNewIstance(getSql_connection())
                     .getListOfRecord(getSql_connection(), Report.class, "where id_recordRef='"
-                            + id_recordRef + "' and id_user='" + id_user + "'");
+                            + id_recordRef+"'");
 
             if (findReport != null) {
                 if (findReport.size() >= 3) {
-                    reviews findReview = (reviews) FactoryRecord.getNewIstance(getSql_connection())
-                            .getSingleRecord(getSql_connection(), reviews.class, "where id_reviews='" + id_recordRef + "'");
+                    Reviews findReview = (Reviews) FactoryRecord.getNewIstance(getSql_connection())
+                            .getSingleRecord(getSql_connection(), Reviews.class, "where idReviews='" + id_recordRef + "'");
                     findReview.setObscured(true);
                     findReview.setSql_connection(getSql_connection());
                     findReview.updateRecord();

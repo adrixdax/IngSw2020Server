@@ -1,13 +1,16 @@
 package core.Classes;
 
+import core.sql.AbstractSQLRecord;
 import core.sql.FactoryRecord;
 import core.sql.MySQLRecord;
 import core.sql.MySqlAnnotation;
 import utility.MySQLUtility;
 
-public class reviews extends MySQLRecord {
+import java.util.List;
+
+public class Reviews extends MySQLRecord {
     @MySqlAnnotation(type = MySQLUtility.type_int)
-    private int id_reviews;
+    private int idReviews;
     @MySqlAnnotation(type = MySQLUtility.type_string)
     private String title;
     @MySqlAnnotation(type = MySQLUtility.type_string)
@@ -24,13 +27,12 @@ public class reviews extends MySQLRecord {
     private boolean obscured = false;
 
 
-
-    public int getId_reviews() {
-        return id_reviews;
+    public int getIdReviews() {
+        return idReviews;
     }
 
-    public void setId_reviews(int id_reviews) {
-        this.id_reviews = id_reviews;
+    public void setIdReviews(int idReviews) {
+        this.idReviews = idReviews;
     }
 
     public String getTitle() {
@@ -94,6 +96,14 @@ public class reviews extends MySQLRecord {
     }
     @Override
     public void afterRecordInsert(){
-        this.id_reviews = ((reviews) FactoryRecord.getNewIstance(getSql_connection()).getSingleRecord(getSql_connection(),this.getClass(),"where iduser='"+this.iduser+"' and idRecordRef='"+this.idRecordRef+"' ORDER BY id_reviews DESC")).getId_reviews();
+        this.idReviews = ((Reviews) FactoryRecord.getNewIstance(getSql_connection()).getSingleRecord(getSql_connection(),this.getClass(),"where iduser='"+this.iduser+"' and idRecordRef='"+this.idRecordRef+"' ORDER BY idReviews DESC")).getIdReviews();
+    }
+
+    @Override
+    public void beforeRecordDeleted() {
+        List<AbstractSQLRecord> reports = FactoryRecord.getNewIstance(getSql_connection()).getListOfRecord(getSql_connection(),Report.class,"where id_recordRef="+this.getIdReviews());
+        for (AbstractSQLRecord r : reports){
+            ((Report)r).deleteRecord();
+        }
     }
 }
