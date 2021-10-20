@@ -17,7 +17,7 @@ class FireBaseUserService {
         try {
             Content response = Request.Get("https://ingsw2021-default-rtdb.firebaseio.com/"+USER_COL_NAME+"/"+uid+".json").execute().returnContent();
             User u = (User) JSONDecoder.getDecodedJson(response.toString(),User.class);
-            u.setIdUSer(uid);
+            u.setIdUser(uid);
             return u;
         } catch (IOException e) {
             e.printStackTrace();
