@@ -339,6 +339,10 @@ public class SpringController {
         } else if (myMap.containsKey("idUser") && myMap.containsKey("insert") && myMap.get("insert").equals("false")) {
             return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, Reviews.class, "iduser='" + myMap.get("idUser") + "' and TypeOfReview='"+myMap.get("typeOfReview")+"' and obscured=false"), Reviews.class.getCanonicalName());
         } else if (myMap.containsKey("idReviews") && myMap.containsKey("delete") && myMap.get("delete").equals("true")){
+            List<AbstractSQLRecord> list = FactoryRecord.getNewIstance(conn).getListOfRecord(conn,Report.class,"id_recordRef='"+myMap.get("idReviews")+"'");
+            for (AbstractSQLRecord r : list){
+                ((Report)r).deleteRecord();
+            }
             Reviews r = (Reviews) FactoryRecord.getNewIstance(conn).getSingleRecord(conn,Reviews.class,"idReviews="+myMap.get("idReviews"));
             r.deleteRecord();
             return "Review deleted correctly";

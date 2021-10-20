@@ -6,15 +6,13 @@ import core.sql.MySQLRecord;
 import core.sql.MySqlAnnotation;
 import utility.MySQLUtility;
 
-public class User extends MySQLRecord {
-    @MySqlAnnotation(type = MySQLUtility.type_string)
-    private String idUSer;
-    @MySqlAnnotation(type = MySQLUtility.type_string)
+public class User{
+
+    private String idUser;
     private String email;
-    @MySqlAnnotation(type = MySQLUtility.type_string)
     private String nick;
-    @MySqlAnnotation(type = MySQLUtility.type_text)
     private String propic;
+    private boolean isAdmin;
 
     @JsonCreator
     public User(@JsonProperty("email") String email,
@@ -26,12 +24,35 @@ public class User extends MySQLRecord {
 
     }
 
-    public String getIdUSer() {
-        return idUSer;
+    @JsonCreator
+    public User(@JsonProperty("email") String email,
+                @JsonProperty("nickname") String nick,
+                @JsonProperty("propic") String propic,
+                @JsonProperty("isAdmin") boolean isAdmin){
+        this.email=email;
+        this.nick=nick;
+        this.propic=propic;
+        this.isAdmin=isAdmin;
     }
 
-    public void setIdUSer(String idUSer) {
-        this.idUSer = idUSer;
+    public String getIdUser() {
+        return idUser;
+    }
+
+    public void setIdUser(String idUser) {
+        this.idUser = idUser;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
 
     public String getEmail() {
