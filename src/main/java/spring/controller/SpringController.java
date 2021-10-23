@@ -9,6 +9,8 @@ import core.FireBase.FireBaseUserService;
 import core.sql.AbstractSQLRecord;
 import core.sql.FactoryRecord;
 import info.movito.themoviedbapi.model.MovieDb;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.ContentType;
 import org.springframework.web.bind.annotation.*;
 import utility.Json.Creation.JSONCreation;
 import utility.Json.Decode.JSONDecoder;
@@ -16,6 +18,7 @@ import utility.Json.Requests.HTTPRequest;
 import utility.NotifyStatusType;
 import utility.UserListType;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -139,14 +142,30 @@ public class SpringController {
     }
 
     @GetMapping(value = "/user")
-    public void getAllUser(){
+    public String getAllUser(@RequestParam Map<String, String> query) throws IOException {
+        String user = query.get("user");
         List<User> l = FireBaseUserService.getListOfFireBaseUsers();
-        /*
-        User u = ricerca u
-        cambia valore isAdmin
-        updateFirebase
-        ritorna esecuzione corretta / errata
-         */
+        User u = null;
+        for (int i = 0; i< Objects.requireNonNull(l).size(); i++){
+            if (user.contains("@")) {
+                if (l.get(i).getEmail().equals(user)) {
+                    u = l.get(i);
+                    i = l.size();
+                }
+            }
+            else {
+                if (l.get(i).getNick().equals(user)) {
+                    u = l.get(i);
+                    i = l.size();
+                }
+            }
+        }
+        if (u==null)
+            return "Utente non trovato";
+        else{
+            FireBaseUserService.updateUser(u.getIdUser(),String.valueOf(true));
+            return "L'utente ora è un admin";
+        }
     }
 
     @PostMapping(value = "/registration")
