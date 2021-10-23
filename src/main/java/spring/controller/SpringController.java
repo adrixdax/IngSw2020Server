@@ -142,24 +142,16 @@ public class SpringController {
     }
 
     @GetMapping(value = "/user")
-    public String getAllUser(@RequestParam Map<String, String> query) throws IOException {
+    public String makeUserAdmin(@RequestParam Map<String, String> query) throws IOException {
         String user = query.get("user");
         List<User> l = FireBaseUserService.getListOfFireBaseUsers();
         User u = null;
         for (int i = 0; i< Objects.requireNonNull(l).size(); i++){
-            if (user.contains("@")) {
-                if (l.get(i).getEmail().equals(user)) {
+                if (l.get(i).getEmail().equals(user) || l.get(i).getNick().equals(user)) {
                     u = l.get(i);
                     i = l.size();
                 }
             }
-            else {
-                if (l.get(i).getNick().equals(user)) {
-                    u = l.get(i);
-                    i = l.size();
-                }
-            }
-        }
         if (u==null)
             return "Utente non trovato";
         else{
