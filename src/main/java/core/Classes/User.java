@@ -17,16 +17,6 @@ public class User{
     @JsonCreator
     public User(@JsonProperty("email") String email,
                 @JsonProperty("nickname") String nick,
-                @JsonProperty("propic") String propic){
-        this.email=email;
-        this.nick=nick;
-        this.propic=propic;
-
-    }
-
-    @JsonCreator
-    public User(@JsonProperty("email") String email,
-                @JsonProperty("nickname") String nick,
                 @JsonProperty("propic") String propic,
                 @JsonProperty("isAdmin") boolean isAdmin){
         this.email=email;
@@ -78,4 +68,10 @@ public class User{
     public void setPropic(String propic) {
         this.propic = propic;
     }
+
+    @Override
+    public String toString(){
+        return this.idUser+" "+this.email+" "+this.nick+" "+this.propic+" "+ this.isAdmin;
+    }
+
 }

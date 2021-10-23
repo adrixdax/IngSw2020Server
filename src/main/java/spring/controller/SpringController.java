@@ -138,6 +138,17 @@ public class SpringController {
         return "";
     }
 
+    @GetMapping(value = "/user")
+    public void getAllUser(){
+        List<User> l = FireBaseUserService.getListOfFireBaseUsers();
+        /*
+        User u = ricerca u
+        cambia valore isAdmin
+        updateFirebase
+        ritorna esecuzione corretta / errata
+         */
+    }
+
     @PostMapping(value = "/registration")
     @ResponseBody
     public String registration(@RequestBody String query) {
