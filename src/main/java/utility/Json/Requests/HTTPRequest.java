@@ -22,4 +22,11 @@ public class HTTPRequest {
         return map;
     }
 
+    @Override
+    public boolean equals(Object o){
+        if (o instanceof HTTPRequest)
+            return this.map.equals(((HTTPRequest) o).map);
+        return false;
+    }
+
 }

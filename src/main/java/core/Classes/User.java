@@ -70,8 +70,14 @@ public class User{
     }
 
     @Override
-    public String toString(){
-        return this.idUser+" "+this.email+" "+this.nick+" "+this.propic+" "+ this.isAdmin;
+    public boolean equals(Object obj) {
+        if (obj.getClass().equals(this.getClass())) {
+            if (this.idUser != null && ((User) obj).idUser != null) {
+                return this.idUser.equals(((User) obj).idUser);
+            }
+            return (this.nick.equals(((User) obj).nick) && this.email.equals(((User) obj).email) && this.propic.equals(((User) obj).propic));
+        }
+        else
+            return false;
     }
-
 }

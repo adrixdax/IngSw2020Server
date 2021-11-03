@@ -16,8 +16,7 @@ public class JSONDecoder {
             return null;
         }
         else if (toConvert.equals(User.class)){
-            ObjectMapper m = new ObjectMapper();
-            return m.readValue(json,User.class);
+            return mapper.readValue(json,User.class);
         }
         return null;
     }
