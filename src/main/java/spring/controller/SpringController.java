@@ -389,14 +389,18 @@ public class SpringController {
     @GetMapping(value = "/list")
     @ResponseBody
     public String list(@RequestParam Map<String, String> query) {
+        System.out.println("Sono entrato nel metodo");
         try {
             checkConnection();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        if (query.containsKey("idUser"))
+        if (query.containsKey("idUser")) {
+            System.out.println("Metodo errato");
             return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, UserList.class, "idUser=" + query.get("idUser")), UserList.class.getCanonicalName());
+        }
         else {
+            System.out.println("Metodo giusti");
             UserList u = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "idUserList='" + query.get("idUserList") + "'");
             return JSONCreation.getJSONToCreate(u, UserList.class.getCanonicalName());
         }
