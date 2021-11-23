@@ -9,8 +9,6 @@ import core.FireBase.FireBaseUserService;
 import core.sql.AbstractSQLRecord;
 import core.sql.FactoryRecord;
 import info.movito.themoviedbapi.model.MovieDb;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.entity.ContentType;
 import org.springframework.web.bind.annotation.*;
 import utility.Json.Creation.JSONCreation;
 import utility.Json.Decode.JSONDecoder;
@@ -112,19 +110,16 @@ public class SpringController {
             Contact contact = (Contact) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Contact.class, "where (user1 ='" + myMap.get("idUser") + "' And user2 ='" + myMap.get("idOtherUser") + "') " +
                     "OR (user1 = '" + myMap.get("idOtherUser") + "' AND user2 ='" + myMap.get("idUser") + "' )");
             Notify not = (Notify) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, Notify.class, "where (id_sender='" + myMap.get("idUser") + "' and id_receiver='" + myMap.get("idOtherUser") + "') or (id_sender='" + myMap.get("idOtherUser") + "' and id_receiver='" + myMap.get("idUser") + "')");
+            not.setState(NotifyStatusType.ACCEPTED.toString());
+            not.setSql_connection(conn);
+            not.updateRecord();
             if (contact == null) {
-                not.setState(NotifyStatusType.ACCEPTED.toString());
-                not.setSql_connection(conn);
-                not.updateRecord();
                 contact = new Contact();
                 contact.setUser1(myMap.get("idUser"));
                 contact.setUser2(myMap.get("idOtherUser"));
                 contact.setSql_connection(conn);
                 contact.addRecord();
             } else {
-                not.setState(NotifyStatusType.ACCEPTED.toString());
-                not.setSql_connection(conn);
-                not.updateRecord();
                 return "Utenti già Amici";
             }
         } else if (myMap.containsKey("isFriends") && myMap.get("isFriends").equals("true") && myMap.containsKey("idUser") && myMap.containsKey("idOtherUser")) {
@@ -162,7 +157,7 @@ public class SpringController {
 
     @PostMapping(value = "/registration")
     @ResponseBody
-    public String registration(@RequestBody String query) {
+    public synchronized String registration(@RequestBody String query) {
         Map<String, String> myMap = getHttpRequestMap(query);
         if (myMap.containsKey("registration")) {
             try {
@@ -291,14 +286,13 @@ public class SpringController {
                     MovieDbExtended movie = new MovieDbExtended(CineMatesTheMovieDB.searchFilmById(((UserPrefered) record).getIdFilm()), ((UserPrefered) record).getCounter());
                     movies.add(movie);
                 }
-                return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
             } else {
                 for (int i = 0; i < 10; i++) {
                     MovieDbExtended movie = new MovieDbExtended(CineMatesTheMovieDB.searchFilmById(((UserPrefered) sql.get(i)).getIdFilm()), ((UserPrefered) sql.get(i)).getCounter());
                     movies.add(movie);
                 }
-                return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
             }
+            return JSONCreation.getJSONToCreate(movies, MovieDbExtended.class.getSimpleName());
         }
         if (myMap.containsKey("filmId")) {
             return JSONCreation.getJSONToCreate(CineMatesTheMovieDB.searchFilmById(Integer.parseInt(myMap.get("filmId"))), MovieDb.class.getSimpleName());
@@ -389,18 +383,15 @@ public class SpringController {
     @GetMapping(value = "/list")
     @ResponseBody
     public String list(@RequestParam Map<String, String> query) {
-        System.out.println("Sono entrato nel metodo");
         try {
             checkConnection();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
         if (query.containsKey("idUser")) {
-            System.out.println("Metodo errato");
             return JSONCreation.getJSONToCreate(FactoryRecord.getNewIstance(conn).getListOfRecord(conn, UserList.class, "idUser=" + query.get("idUser")), UserList.class.getCanonicalName());
         }
         else {
-            System.out.println("Metodo giusti");
             UserList u = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class, "idUserList='" + query.get("idUserList") + "'");
             return JSONCreation.getJSONToCreate(u, UserList.class.getCanonicalName());
         }
@@ -429,41 +420,38 @@ public class SpringController {
             for (AbstractSQLRecord record : sql) {
                 Notify tmp = (Notify) record;
                 if(tmp!=null){
-                    if(not.getDateOfSend()< tmp.getDateOfSend()){
+                    if(Objects.requireNonNull(not).getDateOfSend()< tmp.getDateOfSend()){
                         not=tmp;
                     }
                 }else{
-                    not=tmp;
+                    not= null;
                 }
             }
-            cal2.setTimeInMillis(not.getDateOfSend());
+            cal2.setTimeInMillis(Objects.requireNonNull(not).getDateOfSend());
             cal2.add(Calendar.WEEK_OF_YEAR, 1);
             if (cal2.getTimeInMillis() < cal.getTimeInMillis()) {
-                not = new Notify();
-                not.setSql_connection(conn);
-                not.setId_receiver(query.get("id_receiver"));
-                not.setId_sender(query.get("id_sender"));
-                not.setType(String.valueOf(query.get("type")));
-                not.setId_recordref(Integer.parseInt(query.get("id_recordref").isEmpty() ? "0" : query.get("id_recordref")));
-                not.setState(NotifyStatusType.PENDING.toString());
-                not.setDateOfSend(cal.getTimeInMillis());
-                not.addRecord();
+                createNotify(query, cal);
                 return "Notifica inviata con successo";
 
             } else if (not.getType().equals("LIST")) {
-                not = new Notify();
-                not.setSql_connection(conn);
-                not.setId_receiver(query.get("id_receiver"));
-                not.setId_sender(query.get("id_sender"));
-                not.setType(String.valueOf(query.get("type")));
-                not.setId_recordref(Integer.parseInt(query.get("id_recordref").isEmpty() ? "0" : query.get("id_recordref")));
-                not.setState(NotifyStatusType.PENDING.toString());
-                not.setDateOfSend(cal.getTimeInMillis());
-                not.addRecord();
+                createNotify(query, cal);
             }
             return "Content Shared";
         }
         return "";
+    }
+
+    private void createNotify(Map<String, String> query, Calendar cal) {
+        Notify not;
+        not = new Notify();
+        not.setSql_connection(conn);
+        not.setId_receiver(query.get("id_receiver"));
+        not.setId_sender(query.get("id_sender"));
+        not.setType(String.valueOf(query.get("type")));
+        not.setId_recordref(Integer.parseInt(query.get("id_recordref").isEmpty() ? "0" : query.get("id_recordref")));
+        not.setState(NotifyStatusType.PENDING.toString());
+        not.setDateOfSend(cal.getTimeInMillis());
+        not.addRecord();
     }
 
     @GetMapping(value = "/notify")
