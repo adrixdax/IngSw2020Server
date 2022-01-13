@@ -325,7 +325,6 @@ public class SpringController {
                 rew.setTypeOfReview(myMap.get("typeOfReview"));
                 rew.addRecord();
                 if(myMap.get("typeOfReview").equals("LIST")){
-
                     UserList user = (UserList) FactoryRecord.getNewIstance(conn).getSingleRecord(conn, UserList.class,"where idUserList='"+myMap.get("idRecordRef")+"'");
                     if(user!=null) {
                         Notify notify = new Notify();
@@ -337,7 +336,6 @@ public class SpringController {
                         notify.setType("LIST_REVIEW");
                         notify.setState(NotifyStatusType.PENDING.toString());
                         notify.addRecord();
-
                     }
                 }
 

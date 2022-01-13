@@ -14,8 +14,6 @@ import java.sql.Connection;
 public abstract class AbstractSQLRecord {
 
     private Connection sql_connection;
-    
-    
 
     public abstract void afterRecordLoad();
 

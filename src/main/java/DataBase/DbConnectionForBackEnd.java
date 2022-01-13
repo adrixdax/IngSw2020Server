@@ -11,9 +11,9 @@ import java.util.Scanner;
 public class DbConnectionForBackEnd {
     private static Connection con;
     private static final File config = new File("./config");
-    private String user = "Adriano";
-    private String pw = "IngSw2020!";
-    private String schema = "Cinemates20Development";
+    private String user = "";
+    private String pw = "";
+    private String schema = "";
 
     public DbConnectionForBackEnd() {
         createConnection();
@@ -51,6 +51,9 @@ public class DbConnectionForBackEnd {
 
     public void createConnection() {
         try {
+            recoverUser();
+            recoverPW();
+            recoverSchema();
             Class.forName("com.mysql.cj.jdbc.Driver");
             java.util.Properties connProperties = new java.util.Properties();
             connProperties.put("user", user);
@@ -59,8 +62,7 @@ public class DbConnectionForBackEnd {
             connProperties.put("connectTimeout","0");
             connProperties.put("socketTimeout","0");
             connProperties.put("autoReconnect", "true");
-            System.out.println(connProperties);
-            String linkToDb = "jdbc:mysql://cinematesdevelopment.duckdns.org:3306";
+            String linkToDb = "jdbc:mysql://cinametes.cbyxxfgsthal.eu-central-1.rds.amazonaws.com:3306";
             con = DriverManager.getConnection(linkToDb, connProperties);
             String command = "use "+schema;
             PreparedStatement st = con.prepareStatement(command);
